@@ -1,0 +1,8 @@
+name = "aurora-store"
+compatibility_date = "2026-01-01"
+
+# Cloudflare Pages: сайт полностью статический, собирается из корня репозитория
+pages_build_output_dir = "."
+
+[vars]
+SHOP_NAME = "AURORA"

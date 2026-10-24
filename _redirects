@@ -1,0 +1,9 @@
+# Редиректы Cloudflare Pages
+
+# Главная без /index.html
+/index.html /
+
+# Красивые адреса без .html
+/catalog /catalog.html 200
+/about /about.html 200
+/contacts /contacts.html 200
