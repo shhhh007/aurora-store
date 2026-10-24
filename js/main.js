@@ -1,29 +1,34 @@
 /* ============================================================
-   AURORA — основная логика: корзина, избранное, модалки, UI
+   AURORA — core: cart, favorites, modals, UI (storefront)
+   Products come from AuroraStore (Cloudflare KV via /api/products)
    ============================================================ */
 
 'use strict';
 
-/* ---------- Настройки магазина (замените на свои) ---------- */
+/* ---------- Store settings (edit to yours) ---------- */
 
 const AURORA_CONFIG = {
-  telegram: 'aurora_store',        // ваш ник в Telegram без @
-  whatsapp: '79000000000',         // телефон для WhatsApp, только цифры
-  email: 'hello@aurora-store.ru',
-  freeShippingFrom: 7000,          // бесплатная доставка от суммы, ₽
-  promoCodes: { AURORA10: 10 },    // промокод -> скидка в %
+  telegram: 'aurora_store',     // your Telegram handle without @
+  whatsapp: '79000000000',      // WhatsApp number, digits only
+  email: 'hello@aurora-store.com',
+  freeShippingFrom: 70,         // free shipping threshold, in store currency
+  promoCodes: { AURORA10: 10 }, // promo code -> percent off
 };
 
-/* ---------- Утилиты ---------- */
+/* ---------- Utilities ---------- */
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
 
-const fmt = (n) => new Intl.NumberFormat('ru-RU').format(n) + ' ₽';
+const fmt = (n) => AuroraStore.fmt(n);
+const byId = (id) => AuroraStore.byId(id);
+const catLabel = (key) => AuroraStore.categories[key] || key;
 
-const byId = (id) => window.AURORA_PRODUCTS.find((p) => p.id === id);
+async function ensureStore() {
+  if (!AuroraStore.loaded) await AuroraStore.load();
+}
 
-const badgeLabel = { new: 'Новинка', hit: 'Хит', sale: 'Скидка' };
+const badgeLabel = { new: 'New', hit: 'Hot', sale: 'Sale' };
 
 const load = (key, fallback) => {
   try { return JSON.parse(localStorage.getItem(key)) ?? fallback; }
@@ -31,7 +36,7 @@ const load = (key, fallback) => {
 };
 const save = (key, val) => localStorage.setItem(key, JSON.stringify(val));
 
-/* ---------- Корзина ---------- */
+/* ---------- Cart ---------- */
 
 const CART_KEY = 'aurora_cart_v1';
 const PROMO_KEY = 'aurora_promo_v1';
@@ -77,7 +82,7 @@ function changeQty(id, size, delta) {
   else { saveCart(); renderCart(); updateCartBadge(); }
 }
 
-/* ---------- Избранное ---------- */
+/* ---------- Favorites ---------- */
 
 function toggleFav(id) {
   const i = favs.indexOf(id);
@@ -104,7 +109,7 @@ function toast(msg) {
   setTimeout(() => el.remove(), 3200);
 }
 
-/* ---------- Иконки ---------- */
+/* ---------- Icons ---------- */
 
 const ICON = {
   cart: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>',
@@ -115,61 +120,76 @@ const ICON = {
   trash: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg>',
 };
 
-/* ---------- Карточка товара (общая для главной и каталога) ---------- */
+/* ---------- Product media: real photo or clean placeholder ---------- */
+
+function phClass(id) {
+  let h = 0;
+  for (const c of String(id)) h = (h * 31 + c.charCodeAt(0)) % 997;
+  return 'ph-' + (h % 4);
+}
+
+function productMediaHTML(p, lazy = true) {
+  return p.image
+    ? `<img src="${p.image}" alt="${p.name}" ${lazy ? 'loading="lazy"' : ''}>`
+    : `<div class="ph ${phClass(p.id)}"><span>${(p.name || '?').trim().charAt(0).toUpperCase()}</span></div>`;
+}
+
+/* ---------- Product card (home + catalog) ---------- */
 
 function productCardHTML(p, delay = 0) {
   const fav = favs.includes(p.id);
   const old = p.oldPrice ? `<s>${fmt(p.oldPrice)}</s>` : '';
-  const badge = p.badge ? `<span class="badge badge-${p.badge}">${badgeLabel[p.badge]}</span>` : '';
-  const colors = (p.colors || [])
-    .map((c) => `<i style="background:${c}"></i>`).join('');
+  const badge = p.badge ? `<span class="badge badge-${p.badge}">${badgeLabel[p.badge] || p.badge}</span>` : '';
+  const colors = (p.colors || []).map((c) => `<i style="background:${c}"></i>`).join('');
+  const rating = p.reviews ? `<span class="results-count">★ ${p.rating} · ${p.reviews} reviews</span>` : '';
   return `
   <article class="product-card reveal" style="--d:${delay}s" data-tilt>
     <div class="product-media">
-      <img src="${p.image}" alt="${p.name}" loading="lazy" width="600" height="750">
+      ${productMediaHTML(p)}
       <div class="product-badges">${badge}</div>
-      <button class="fav-btn ${fav ? 'active' : ''}" data-fav="${p.id}" aria-label="В избранное">${ICON.heart}</button>
+      <button class="fav-btn ${fav ? 'active' : ''}" data-fav="${p.id}" aria-label="Add to favorites">${ICON.heart}</button>
     </div>
     <div class="product-body">
-      <span class="product-cat">${window.AURORA_CATEGORIES[p.category]}</span>
+      <span class="product-cat">${catLabel(p.category)}</span>
       <h3 class="product-name">${p.name}</h3>
       <div class="product-row">
         <div class="price"><b>${fmt(p.price)}</b>${old}</div>
         <div class="product-colors">${colors}</div>
       </div>
       <div class="product-row">
-        <span class="results-count">★ ${p.rating} · ${p.reviews} отзывов</span>
-        <button class="add-btn" data-add="${p.id}" aria-label="Добавить в корзину">${ICON.plus}</button>
+        ${rating || '<span></span>'}
+        <button class="add-btn" data-add="${p.id}" aria-label="Add to cart">${ICON.plus}</button>
       </div>
     </div>
   </article>`;
 }
 
-/* Быстрое добавление: выбираем размер, потом в корзину */
+/* ---------- Quick add: pick a size, then into the cart ---------- */
+
 function quickAdd(id) {
   const p = byId(id);
   if (!p) return;
-  if (p.sizes.length === 1) {
-    addToCart(p.id, p.sizes[0]);
-    toast(`«${p.name}» — в корзине`);
+  if ((p.sizes || []).length <= 1) {
+    addToCart(p.id, (p.sizes || ['OS'])[0]);
+    toast(`“${p.name}” added to cart`);
     openCart();
     return;
   }
   openModal(`
-    <button class="modal-close" data-modal-close aria-label="Закрыть">${ICON.x}</button>
-    <h3>Выберите размер</h3>
+    <button class="modal-close" data-modal-close aria-label="Close">${ICON.x}</button>
+    <h3>Select a size</h3>
     <p class="modal-sub">${p.name}</p>
     <div class="qv-product">
-      <img src="${p.image}" alt="${p.name}">
+      ${productMediaHTML(p)}
       <div>
         <div class="price" style="margin-bottom:6px"><b>${fmt(p.price)}</b></div>
-        <p style="color:var(--muted);font-size:0.85rem">${p.desc.split('.')[0]}.</p>
+        <p style="color:var(--muted);font-size:0.85rem">${(p.desc || '').split('.')[0]}.</p>
       </div>
     </div>
     <div class="size-picker">
       ${p.sizes.map((s, i) => `<button class="size-btn ${i === Math.floor(p.sizes.length / 2) ? 'active' : ''}" data-size="${s}">${s}</button>`).join('')}
     </div>
-    <button class="btn btn-grad" style="width:100%" data-qv-add="${p.id}">Добавить в корзину — <span data-qv-price>${fmt(p.price)}</span></button>
+    <button class="btn btn-grad" style="width:100%" data-qv-add="${p.id}">Add to cart — <span data-qv-price>${fmt(p.price)}</span></button>
   `);
   const modal = $('[data-modal]');
   modal.addEventListener('click', (e) => {
@@ -181,7 +201,7 @@ function quickAdd(id) {
   });
 }
 
-/* ---------- Модалки ---------- */
+/* ---------- Modals ---------- */
 
 function openModal(html) {
   let overlay = $('[data-modal-overlay]');
@@ -206,7 +226,7 @@ function closeModal() {
   if (!$('.cart-drawer.open')) document.body.style.overflow = '';
 }
 
-/* ---------- Корзина-drawer ---------- */
+/* ---------- Cart drawer ---------- */
 
 function ensureDrawer() {
   if ($('[data-cart-drawer]')) return;
@@ -220,22 +240,22 @@ function ensureDrawer() {
   drawer.setAttribute('data-cart-drawer', '');
   drawer.innerHTML = `
     <div class="cart-head">
-      <h3>Корзина <span data-cart-total-count>0</span></h3>
-      <button class="drawer-close" data-cart-close aria-label="Закрыть">${ICON.x}</button>
+      <h3>Cart <span data-cart-total-count>0</span></h3>
+      <button class="drawer-close" data-cart-close aria-label="Close">${ICON.x}</button>
     </div>
     <div class="cart-items" data-cart-items></div>
     <div class="shipping-bar" data-shipping hidden></div>
     <div class="cart-foot" data-cart-foot hidden>
       <div class="promo-row">
-        <input type="text" placeholder="Промокод" data-promo-input aria-label="Промокод">
-        <button class="btn btn-ghost btn-sm" data-promo-apply>Применить</button>
+        <input type="text" placeholder="Promo code" data-promo-input aria-label="Promo code">
+        <button class="btn btn-ghost btn-sm" data-promo-apply>Apply</button>
       </div>
       <div class="cart-discount" data-discount-row hidden><span data-promo-label></span><span data-discount-val></span></div>
       <div class="cart-total">
-        <span>Итого</span>
-        <b data-cart-total>0 ₽</b>
+        <span>Total</span>
+        <b data-cart-total>0</b>
       </div>
-      <button class="btn btn-grad" style="width:100%" data-checkout>Оформить заказ</button>
+      <button class="btn btn-grad" style="width:100%" data-checkout>Checkout</button>
     </div>`;
   document.body.append(overlay, drawer);
 
@@ -246,7 +266,7 @@ function ensureDrawer() {
     const rem = e.target.closest('[data-remove]');
     if (inc) changeQty(inc.dataset.inc, inc.dataset.size, 1);
     if (dec) changeQty(dec.dataset.dec, dec.dataset.size, -1);
-    if (rem) { removeLine(rem.dataset.remove, rem.dataset.size); toast('Товар удалён из корзины'); }
+    if (rem) { removeLine(rem.dataset.remove, rem.dataset.size); toast('Removed from cart'); }
     if (e.target.closest('[data-checkout]')) openCheckout();
     if (e.target.closest('[data-promo-apply]')) {
       const input = $('[data-promo-input]', drawer);
@@ -255,9 +275,9 @@ function ensureDrawer() {
         promoCode = code;
         save(PROMO_KEY, code);
         renderCart();
-        toast(`Промокод ${code} применён`);
+        toast(`Promo ${code} applied`);
       } else {
-        toast('Такого промокода нет');
+        toast('Unknown promo code');
         input.value = '';
       }
     }
@@ -276,9 +296,9 @@ function renderCart() {
     wrap.innerHTML = `
       <div class="cart-empty">
         <div class="big">🌌</div>
-        <b>Пока пусто</b>
-        <span>Добавьте что-нибудь из каталога — там всё светится.</span>
-        <a href="catalog.html" class="btn btn-ghost btn-sm" style="margin-top:10px" data-cart-close-link>К каталогу</a>
+        <b>Your cart is empty</b>
+        <span>Add something from the catalog — it glows, we promise.</span>
+        <a href="catalog.html" class="btn btn-ghost btn-sm" style="margin-top:10px" data-cart-close-link>Browse catalog</a>
       </div>`;
     foot.hidden = true;
     ship.hidden = true;
@@ -290,18 +310,18 @@ function renderCart() {
     if (!p) return '';
     return `
     <div class="cart-item">
-      <img src="${p.image}" alt="${p.name}">
+      <div class="cart-item-thumb">${productMediaHTML(p)}</div>
       <div class="cart-item-info">
         <b>${p.name}</b>
-        <span>Размер: ${i.size}</span>
+        <span>Size: ${i.size}</span>
         <div class="cart-item-qty">
-          <button class="qty-btn" data-dec="${p.id}" data-size="${i.size}" aria-label="Меньше">−</button>
+          <button class="qty-btn" data-dec="${p.id}" data-size="${i.size}" aria-label="Less">−</button>
           <span class="qty-val">${i.qty}</span>
-          <button class="qty-btn" data-inc="${p.id}" data-size="${i.size}" aria-label="Больше">+</button>
+          <button class="qty-btn" data-inc="${p.id}" data-size="${i.size}" aria-label="More">+</button>
         </div>
       </div>
       <div class="cart-item-side">
-        <button class="remove-btn" data-remove="${p.id}" data-size="${i.size}" aria-label="Удалить">${ICON.trash}</button>
+        <button class="remove-btn" data-remove="${p.id}" data-size="${i.size}" aria-label="Remove">${ICON.trash}</button>
         <b>${fmt(p.price * i.qty)}</b>
       </div>
     </div>`;
@@ -319,7 +339,7 @@ function renderCart() {
   const dRow = $('[data-discount-row]');
   if (disc) {
     dRow.hidden = false;
-    $('[data-promo-label]').textContent = `Промокод ${promoCode}`;
+    $('[data-promo-label]').textContent = `Promo ${promoCode}`;
     $('[data-discount-val]').textContent = `−${fmt(disc)}`;
   } else {
     dRow.hidden = true;
@@ -329,15 +349,15 @@ function renderCart() {
   ship.hidden = false;
   const pct = Math.min(100, (sub / AURORA_CONFIG.freeShippingFrom) * 100);
   ship.innerHTML = left > 0
-    ? `До бесплатной доставки <b>${fmt(left)}</b>
+    ? `<b>${fmt(left)}</b> away from free shipping
        <div class="shipping-track"><div class="shipping-fill" style="width:${pct}%"></div></div>`
-    : `<b>🚚 Бесплатная доставка</b> — уже ваша
+    : `<b>🚚 Free shipping</b> — unlocked
        <div class="shipping-track"><div class="shipping-fill" style="width:100%"></div></div>`;
 }
 
 function openCart() {
   ensureDrawer();
-  renderCart();
+  ensureStore().then(renderCart);
   $('[data-cart-drawer]').classList.add('open');
   $('[data-cart-overlay]').classList.add('show');
   document.body.style.overflow = 'hidden';
@@ -351,7 +371,7 @@ function closeCart() {
   if (!$('.modal-overlay.show')) document.body.style.overflow = '';
 }
 
-/* ---------- Оформление заказа ---------- */
+/* ---------- Checkout ---------- */
 
 function openCheckout() {
   if (!cartCount()) return;
@@ -364,38 +384,38 @@ function openCheckout() {
   }).join('');
 
   openModal(`
-    <button class="modal-close" data-modal-close aria-label="Закрыть">${ICON.x}</button>
-    <h3>Оформление заказа</h3>
-    <p class="modal-sub">Оплата при получении или по ссылке — менеджер напишет вам в течение часа.</p>
+    <button class="modal-close" data-modal-close aria-label="Close">${ICON.x}</button>
+    <h3>Checkout</h3>
+    <p class="modal-sub">Pay on delivery or by link — we'll message you within the hour.</p>
     <div class="checkout-summary">${list}
-      <div style="margin-top:8px"><b style="color:var(--text)">Итого: ${fmt(total)}</b>${disc ? ` <span style="color:var(--mint)">(скидка −${fmt(disc)})</span>` : ''}</div>
+      <div style="margin-top:8px"><b style="color:var(--text)">Total: ${fmt(total)}</b>${disc ? ` <span style="color:var(--mint)">(−${fmt(disc)} off)</span>` : ''}</div>
     </div>
     <form class="form-grid" data-checkout-form style="margin-top:18px">
       <div class="form-field">
-        <label for="co-name">Имя</label>
-        <input id="co-name" name="name" type="text" placeholder="Как к вам обращаться" required>
+        <label for="co-name">Name</label>
+        <input id="co-name" name="name" type="text" placeholder="How should we call you?" required>
       </div>
       <div class="form-field">
-        <label for="co-contact">Телефон или Telegram</label>
-        <input id="co-contact" name="contact" type="text" placeholder="@nickname или +7 900 000-00-00" required>
+        <label for="co-contact">Phone or Telegram</label>
+        <input id="co-contact" name="contact" type="text" placeholder="@nickname or +1 555 000-0000" required>
       </div>
       <div class="form-field">
-        <label for="co-delivery">Доставка</label>
+        <label for="co-delivery">Delivery</label>
         <select id="co-delivery" name="delivery">
-          <option>СДЭК</option>
-          <option>Почта России</option>
-          <option>Boxberry</option>
-          <option>Самовывоз (Москва)</option>
+          <option>Standard courier</option>
+          <option>Post</option>
+          <option>Express</option>
+          <option>Local pickup</option>
         </select>
       </div>
       <div class="form-field">
-        <label for="co-note">Комментарий</label>
-        <textarea id="co-note" name="note" placeholder="Город, адрес, пожелания…"></textarea>
+        <label for="co-note">Note</label>
+        <textarea id="co-note" name="note" placeholder="City, address, comments…"></textarea>
       </div>
       <div class="checkout-actions">
-        <button type="submit" class="btn btn-grad" style="width:100%">Отправить заказ в WhatsApp</button>
-        <button type="button" class="btn btn-ghost" style="width:100%" data-send-tg>Написать в Telegram</button>
-        <button type="button" class="btn btn-ghost btn-sm" style="width:100%" data-copy-order>Скопировать состав заказа</button>
+        <button type="submit" class="btn btn-grad" style="width:100%">Send order via WhatsApp</button>
+        <button type="button" class="btn btn-ghost" style="width:100%" data-send-tg>Message us on Telegram</button>
+        <button type="button" class="btn btn-ghost btn-sm" style="width:100%" data-copy-order>Copy order details</button>
         <div class="copy-ok" data-copy-status></div>
       </div>
     </form>
@@ -408,13 +428,13 @@ function openCheckout() {
       return `${n + 1}) ${p.name} — ${i.size} × ${i.qty} — ${fmt(p.price * i.qty)}`;
     });
     return [
-      '🌌 Заказ AURORA', '',
+      '🌌 AURORA order', '',
       ...lines, '',
-      `Доставка: ${data.delivery}`,
-      `Итого: ${fmt(total)}`,
-      disc ? `Промокод: ${promoCode} (−${fmt(disc)})` : '',
-      '', `Имя: ${data.name}`, `Связь: ${data.contact}`,
-      data.note ? `Комментарий: ${data.note}` : '',
+      `Delivery: ${data.delivery}`,
+      `Total: ${fmt(total)}`,
+      disc ? `Promo: ${promoCode} (−${fmt(disc)})` : '',
+      '', `Name: ${data.name}`, `Contact: ${data.contact}`,
+      data.note ? `Note: ${data.note}` : '',
     ].filter(Boolean).join('\n');
   };
 
@@ -444,17 +464,19 @@ function openCheckout() {
       document.execCommand('copy');
       ta.remove();
     }
-    $('[data-copy-status]').textContent = 'Состав заказа скопирован ✓';
+    $('[data-copy-status]').textContent = 'Order details copied ✓';
   });
 }
 
-/* ---------- Общая шапка-логика ---------- */
+/* ---------- Header ---------- */
 
 function initHeader() {
   const header = $('.site-header');
-  const onScroll = () => header.classList.toggle('scrolled', scrollY > 12);
-  addEventListener('scroll', onScroll, { passive: true });
-  onScroll();
+  if (header) {
+    const onScroll = () => header.classList.toggle('scrolled', scrollY > 12);
+    addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+  }
 
   const burger = $('[data-burger]');
   const menu = $('[data-mobile-menu]');
@@ -470,7 +492,7 @@ function initHeader() {
   }
 }
 
-/* ---------- Появление при скролле ---------- */
+/* ---------- Scroll reveal ---------- */
 
 function initReveal() {
   const io = new IntersectionObserver((entries) => {
@@ -481,10 +503,10 @@ function initReveal() {
       }
     });
   }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
-  $$('.reveal').forEach((el) => io.observe(el));
+  $$('.reveal:not(.in)').forEach((el) => io.observe(el));
 }
 
-/* ---------- 3D-наклон карточек ---------- */
+/* ---------- 3D tilt on cards ---------- */
 
 function initTilt() {
   if (!matchMedia('(hover:hover)').matches) return;
@@ -502,7 +524,7 @@ function initTilt() {
   });
 }
 
-/* ---------- Прожектор за курсором в хиро ---------- */
+/* ---------- Cursor spotlight in hero ---------- */
 
 function initSpotlight() {
   const hero = $('.hero');
@@ -514,18 +536,18 @@ function initSpotlight() {
   });
 }
 
-/* ---------- Глобальные обработчики ---------- */
+/* ---------- Global events ---------- */
 
 function initGlobalEvents() {
   document.addEventListener('click', (e) => {
     const add = e.target.closest('[data-add]');
-    if (add) { quickAdd(add.dataset.add); return; }
+    if (add) { ensureStore().then(() => quickAdd(add.dataset.add)); return; }
 
     const fav = e.target.closest('[data-fav]');
     if (fav) {
       toggleFav(fav.dataset.fav);
-      if (!favs.includes(fav.dataset.fav)) toast('Убрано из избранного');
-      else toast('Добавлено в избранное ♥');
+      if (!favs.includes(fav.dataset.fav)) toast('Removed from favorites');
+      else toast('Added to favorites ♥');
       return;
     }
 
@@ -534,7 +556,7 @@ function initGlobalEvents() {
       const size = $('.size-btn.active', $('[data-modal]'));
       addToCart(qvAdd.dataset.qvAdd, size ? size.dataset.size : 'OS');
       closeModal();
-      toast('Добавлено в корзину');
+      toast('Added to cart');
       openCart();
       return;
     }
@@ -547,11 +569,6 @@ function initGlobalEvents() {
     if (e.key === 'Escape') { closeCart(); closeModal(); }
   });
 
-  document.addEventListener('aurora:favs', () => {
-    document.dispatchEvent(new CustomEvent('aurora:refilter'));
-  });
-
-  // Синхронизация корзины между вкладками
   addEventListener('storage', (e) => {
     if (e.key === CART_KEY) {
       cart = load(CART_KEY, []);
@@ -569,7 +586,7 @@ function updateCartBadge() {
   });
 }
 
-/* ---------- Старт ---------- */
+/* ---------- Boot ---------- */
 
 document.addEventListener('DOMContentLoaded', () => {
   initHeader();
@@ -579,4 +596,5 @@ document.addEventListener('DOMContentLoaded', () => {
   initGlobalEvents();
   updateCartBadge();
   $$('[data-year]').forEach((el) => (el.textContent = new Date().getFullYear()));
+  ensureStore(); // прогреваем каталог товаров
 });

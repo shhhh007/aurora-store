@@ -1129,6 +1129,162 @@
   animation: float 5s ease-in-out infinite;
 }
 
+/* ---------- Плейсхолдер без фото (пока товар не загружен в админке) ---------- */
+
+.ph {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+}
+
+.ph span {
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 8vw, 5rem);
+  font-weight: 800;
+  background: var(--grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  opacity: 0.9;
+  filter: drop-shadow(0 0 30px rgba(167, 139, 250, 0.4));
+}
+
+.ph-0 { background: radial-gradient(120% 90% at 30% 20%, rgba(167, 139, 250, 0.28), transparent 60%), radial-gradient(110% 90% at 80% 90%, rgba(103, 232, 249, 0.16), transparent 60%), var(--bg-soft); }
+.ph-1 { background: radial-gradient(120% 90% at 70% 25%, rgba(103, 232, 249, 0.26), transparent 60%), radial-gradient(110% 90% at 20% 85%, rgba(240, 171, 252, 0.16), transparent 60%), var(--bg-soft); }
+.ph-2 { background: radial-gradient(120% 90% at 50% 15%, rgba(240, 171, 252, 0.24), transparent 60%), radial-gradient(110% 90% at 75% 90%, rgba(167, 139, 250, 0.18), transparent 60%), var(--bg-soft); }
+.ph-3 { background: radial-gradient(120% 90% at 35% 30%, rgba(110, 231, 183, 0.22), transparent 60%), radial-gradient(110% 90% at 80% 85%, rgba(103, 232, 249, 0.18), transparent 60%), var(--bg-soft); }
+
+.cart-item-thumb {
+  width: 72px;
+  height: 84px;
+  border-radius: 10px;
+  overflow: hidden;
+  flex: none;
+}
+
+.cart-item-thumb .ph span { font-size: 1.6rem; }
+
+/* ---------- Админка ---------- */
+
+.admin-wrap { min-height: 100svh; padding: calc(var(--header-h) + 40px) 0 80px; }
+
+.admin-card {
+  width: min(1060px, 100%);
+  margin-inline: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  padding: clamp(22px, 3.5vw, 40px);
+}
+
+.admin-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 26px;
+}
+
+.admin-head h1 { font-size: 1.4rem; }
+
+.admin-table { width: 100%; border-collapse: collapse; }
+
+.admin-table th {
+  text-align: left;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted-2);
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+.admin-table td {
+  padding: 12px;
+  border-bottom: 1px solid var(--line);
+  font-size: 0.92rem;
+  vertical-align: middle;
+}
+
+.admin-table tr:hover td { background: rgba(255, 255, 255, 0.02); }
+
+.admin-thumb {
+  width: 52px;
+  height: 62px;
+  border-radius: 10px;
+  overflow: hidden;
+  flex: none;
+}
+
+.admin-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.admin-thumb .ph span { font-size: 1.2rem; }
+
+.admin-actions { display: flex; gap: 8px; justify-content: flex-end; }
+
+.admin-login {
+  width: min(440px, 100%);
+  margin: 8vh auto 0;
+}
+
+.admin-note {
+  border: 1px solid rgba(103, 232, 249, 0.3);
+  background: rgba(103, 232, 249, 0.07);
+  border-radius: var(--r-md);
+  padding: 18px 22px;
+  font-size: 0.92rem;
+  color: var(--muted);
+  margin-bottom: 22px;
+}
+
+.admin-note b { color: var(--cyan); }
+
+.setup-steps { margin: 12px 0 0; padding-left: 20px; display: grid; gap: 6px; }
+.setup-steps code {
+  background: rgba(255, 255, 255, 0.07);
+  border-radius: 6px;
+  padding: 1px 7px;
+  font-size: 0.84em;
+}
+
+.upload-box {
+  border: 1.5px dashed var(--line-strong);
+  border-radius: var(--r-md);
+  padding: 22px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.9rem;
+  transition: border-color 0.3s, background 0.3s;
+  cursor: pointer;
+}
+
+.upload-box:hover { border-color: rgba(167, 139, 250, 0.5); background: rgba(167, 139, 250, 0.05); }
+
+.upload-box img, .upload-box .ph {
+  width: 100%;
+  height: 200px;
+  border-radius: 12px;
+  overflow: hidden;
+  object-fit: cover;
+  margin-bottom: 12px;
+}
+
+.upload-box .ph { display: grid; }
+.upload-box input[type="file"] { display: none; }
+
+.admin-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.admin-form-grid .full { grid-column: 1 / -1; }
+
+@media (max-width: 720px) {
+  .admin-form-grid { grid-template-columns: 1fr; }
+  .admin-table th:nth-child(4), .admin-table td:nth-child(4),
+  .admin-table th:nth-child(5), .admin-table td:nth-child(5) { display: none; }
+}
+
+
+
 /* ---------- Адаптив ---------- */
 
 @media (max-width: 1080px) {

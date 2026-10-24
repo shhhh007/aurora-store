@@ -1,5 +1,5 @@
 /* ============================================================
-   AURORA — каталог: фильтры, поиск, сортировка, избранное
+   AURORA — catalog: filters, search, sorting, favorites
    ============================================================ */
 
 'use strict';
@@ -11,6 +11,7 @@ const resetChip = $('[data-reset]');
 const searchInput = $('[data-search]');
 const sortSelect = $('[data-sort]');
 const countEl = $('[data-count]');
+const demoNote = $('[data-demo-note]');
 
 const catalogState = {
   cat: new URLSearchParams(location.search).get('cat') || 'all',
@@ -19,25 +20,25 @@ const catalogState = {
   onlyFavs: false,
 };
 
-/* ---------- Фильтры ---------- */
+/* ---------- Filters ---------- */
 
 function renderChips() {
-  const counts = { all: window.AURORA_PRODUCTS.length };
-  for (const p of window.AURORA_PRODUCTS) {
+  const counts = { all: AuroraStore.products.length };
+  for (const p of AuroraStore.products) {
     counts[p.category] = (counts[p.category] || 0) + 1;
   }
   const chip = (key, label, n) =>
     `<button class="chip ${catalogState.cat === key ? 'active' : ''}" data-cat="${key}">${label}<small>${n}</small></button>`;
 
   chipsWrap.innerHTML =
-    chip('all', 'Всё', counts.all) +
-    Object.entries(window.AURORA_CATEGORIES)
+    chip('all', 'All', counts.all) +
+    Object.entries(AuroraStore.categories)
       .map(([key, label]) => chip(key, label, counts[key] || 0))
       .join('');
 }
 
 function currentList() {
-  let list = [...window.AURORA_PRODUCTS];
+  let list = [...AuroraStore.products];
   if (catalogState.cat !== 'all') {
     list = list.filter((p) => p.category === catalogState.cat);
   }
@@ -63,21 +64,21 @@ function currentList() {
       );
       break;
     default:
-      list.sort((a, b) => b.rating * b.reviews - a.rating * a.reviews);
+      list.sort((a, b) => (b.rating || 0) * (b.reviews || 0) - (a.rating || 0) * (a.reviews || 0));
   }
   return list;
 }
 
 function renderCatalog() {
   const list = currentList();
-  countEl.textContent = `Найдено: ${list.length}`;
+  countEl.textContent = `${list.length} item${list.length === 1 ? '' : 's'}`;
 
   if (!list.length) {
     catalogGrid.innerHTML = `
       <div class="empty-state" style="grid-column:1/-1">
         <div class="big">🔭</div>
-        <b>Ничего не нашлось</b>
-        <span>Попробуй другой запрос или сбрось фильтры — сияние ещё вернётся.</span>
+        <b>Nothing found</b>
+        <span>Try another search or reset the filters — the glow will return.</span>
       </div>`;
     return;
   }
@@ -95,7 +96,7 @@ function syncUrl() {
   history.replaceState(null, '', url);
 }
 
-/* ---------- События ---------- */
+/* ---------- Events ---------- */
 
 chipsWrap.addEventListener('click', (e) => {
   const chip = e.target.closest('[data-cat]');
@@ -139,12 +140,15 @@ sortSelect.addEventListener('change', () => {
   renderCatalog();
 });
 
-/* Перерисовать, если меняли избранное прямо из карточек каталога */
+/* Re-render if favorites changed on this page */
 document.addEventListener('aurora:favs', () => {
   if (catalogState.onlyFavs) renderCatalog();
 });
 
-/* ---------- Старт ---------- */
+/* ---------- Boot ---------- */
 
-renderChips();
-renderCatalog();
+AuroraStore.load().then(() => {
+  if (AuroraStore.demo && demoNote) demoNote.hidden = false;
+  renderChips();
+  renderCatalog();
+});
