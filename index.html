@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AURORA — одежда цвета северного сияния</title>
+  <meta name="description" content="Aurora — магазин лимитированной одежды и аксессуаров. Худи, футболки, карго и аксессуары из маленьких дропов. Бесплатная доставка от 7 000 ₽.">
+  <meta name="theme-color" content="#07070d">
+  <meta property="og:title" content="AURORA — одежда цвета северного сияния">
+  <meta property="og:description" content="Лимитированные дропы одежды и аксессуаров. Маленькие партии — большие эмоции.">
+  <meta property="og:type" content="website">
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;800&family=Manrope:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+
+  <!-- Шапка -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo">
+        <span class="logo-mark">A</span>
+        <span>AURORA<span class="logo-sub">wear the light</span></span>
+      </a>
+      <nav class="nav">
+        <a href="index.html" class="active">Главная</a>
+        <a href="catalog.html">Каталог</a>
+        <a href="about.html">О бренде</a>
+        <a href="contacts.html">Контакты</a>
+      </nav>
+      <div class="header-actions">
+        <button class="icon-btn" data-cart-open aria-label="Открыть корзину">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+          <span class="cart-count">0</span>
+        </button>
+        <button class="icon-btn burger" data-burger aria-label="Меню">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h12"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Мобильное меню -->
+  <div class="mobile-menu" data-mobile-menu>
+    <button class="icon-btn menu-close" data-burger aria-label="Закрыть меню">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+    </button>
+    <a href="index.html" class="active">Главная</a>
+    <a href="catalog.html">Каталог</a>
+    <a href="about.html">О бренде</a>
+    <a href="contacts.html">Контакты</a>
+  </div>
+
+  <!-- Хиро -->
+  <section class="hero">
+    <div class="aurora-bg"><span class="aurora-3"></span></div>
+    <div class="stars"></div>
+    <div class="hero-spotlight"></div>
+    <div class="container hero-inner">
+      <div>
+        <div class="hero-eyebrow"><span class="dot"></span> Дроп FW26 уже в каталоге</div>
+        <h1>
+          <span class="line"><span>Одежда цвета</span></span>
+          <span class="line"><span class="grad-text">северного</span></span>
+          <span class="line"><span>сияния</span></span>
+        </h1>
+        <p class="hero-sub">Aurora — маленький бренд с большими дропами. Плотные худи, честный хлопок и аксессуары, которые видно даже в полярную ночь.</p>
+        <div class="hero-cta">
+          <a class="btn btn-primary" href="catalog.html">Смотреть каталог
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </a>
+          <a class="btn btn-ghost" href="about.html">О бренде</a>
+        </div>
+        <div class="hero-stats">
+          <div class="stat"><b>1 200+</b><span>довольных клиентов</span></div>
+          <div class="stat"><b>4.9</b><span>средняя оценка</span></div>
+          <div class="stat"><b>48 ч</b><span>отправка заказа</span></div>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="float-card fc-1"><img src="assets/img/p01.svg" alt="Худи «Полярная»" width="600" height="750"></div>
+        <div class="float-card fc-2"><img src="assets/img/p09.svg" alt="Шапка-бини «Поляр»" width="600" height="750"></div>
+        <div class="float-card fc-3"><img src="assets/img/p03.svg" alt="Футболка «Чёрный лёд»" width="600" height="750"></div>
+        <div class="float-tag ft-1"><span class="tag-ico">✦</span> Лимитка — 50 штук</div>
+        <div class="float-tag ft-2"><span class="tag-ico">✦</span> От 1 490 ₽</div>
+      </div>
+    </div>
+    <div class="scroll-hint">Листай</div>
+  </section>
+
+  <!-- Бегущая строка -->
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee-track">
+      <span class="marquee-item">Новая коллекция FW26 <i></i> Бесплатная доставка от 7 000 ₽ <i></i> Лимитированные дропы <i></i> Оплата при получении <i></i> Отправка за 48 часов <i></i></span>
+      <span class="marquee-item">Новая коллекция FW26 <i></i> Бесплатная доставка от 7 000 ₽ <i></i> Лимитированные дропы <i></i> Оплата при получении <i></i> Отправка за 48 часов <i></i></span>
+    </div>
+  </div>
+
+  <!-- Хиты дропа -->
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">Избранное</span>
+        <h2 class="h-lg">Хиты последнего дропа</h2>
+        <p>Разобрали почти до нуля — успей забрать своё, пока не улетело в архив.</p>
+      </div>
+      <div class="products-grid" id="featured-grid"></div>
+      <div style="text-align:center; margin-top:44px">
+        <a class="btn btn-ghost" href="catalog.html">Весь каталог
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Категории -->
+  <section class="section" style="padding-top:0">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">Категории</span>
+        <h2 class="h-lg">Наведи свет на своё</h2>
+      </div>
+      <div class="cat-tiles">
+        <a href="catalog.html?cat=hoodies" class="cat-tile reveal">
+          <img src="assets/img/p01.svg" alt="" loading="lazy">
+          <span class="cat-arrow"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg></span>
+          <b>Худи и свитшоты</b>
+          <span>4 вещи · от 3 990 ₽</span>
+        </a>
+        <a href="catalog.html?cat=tees" class="cat-tile reveal" style="--d:.08s">
+          <img src="assets/img/p03.svg" alt="" loading="lazy">
+          <span class="cat-arrow"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg></span>
+          <b>Футболки и лонгсливы</b>
+          <span>2 вещи · от 2 290 ₽</span>
+        </a>
+        <a href="catalog.html?cat=pants" class="cat-tile reveal" style="--d:.16s">
+          <img src="assets/img/p06.svg" alt="" loading="lazy">
+          <span class="cat-arrow"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg></span>
+          <b>Брюки и джинсы</b>
+          <span>2 вещи · от 5 990 ₽</span>
+        </a>
+        <a href="catalog.html?cat=acc" class="cat-tile reveal" style="--d:.24s">
+          <img src="assets/img/p10.svg" alt="" loading="lazy">
+          <span class="cat-arrow"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg></span>
+          <b>Аксессуары</b>
+          <span>4 вещи · от 1 490 ₽</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Почему мы -->
+  <section class="section" style="padding-top:0">
+    <div class="container">
+      <div class="section-head center">
+        <span class="eyebrow center">Почему Aurora</span>
+        <h2 class="h-lg">Мало, но честно</h2>
+      </div>
+      <div class="features-grid">
+        <div class="feature reveal">
+          <div class="feature-ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></div>
+          <h3>Отправка за 48 часов</h3>
+          <p>Собираем и отправляем заказ в течение двух дней. По России — 1–5 дней до пункта выдачи.</p>
+        </div>
+        <div class="feature reveal" style="--d:.08s">
+          <div class="feature-ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 5.8H20l-4.9 3.6 1.9 5.8-5-3.6-5 3.6 1.9-5.8L4 8.8h6.1z"/></svg></div>
+          <h3>Лимитка без повторов</h3>
+          <p>Каждый дроп — не больше 50 штук на размер. Разобрали — вещь уходит в архив навсегда.</p>
+        </div>
+        <div class="feature reveal" style="--d:.16s">
+          <div class="feature-ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c4-3 8-6.5 8-11a8 8 0 1 0-16 0c0 4.5 4 8 8 11z"/><path d="M12 8v6M9 11h6"/></svg></div>
+          <h3>Честные ткани</h3>
+          <p>Футер 320 г/м², пенье, рипстоп. Всё носится, стирается и живёт дольше одного сезона.</p>
+        </div>
+        <div class="feature reveal" style="--d:.24s">
+          <div class="feature-ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8z"/></svg></div>
+          <h3>Живая поддержка</h3>
+          <p>Отвечаем в Telegram как люди: поможем с размером, составом и трек-номером.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Отзывы -->
+  <section class="section" style="padding-top:0">
+    <div class="container">
+      <div class="section-head">
+        <span class="eyebrow">Отзывы</span>
+        <h2 class="h-lg">Что пишут после доставки</h2>
+      </div>
+      <div class="reviews-grid">
+        <div class="review reveal">
+          <div class="review-stars">★★★★★</div>
+          <p>«Худи "Полярная" — самая плотная вещь в гардеробе. Внутри начёс, снаружи градиент не выцвел после десяти стирок. До Москвы доехало за два дня.»</p>
+          <div class="review-author">
+            <div class="avatar">К</div>
+            <div><b>Ксения</b><span>Москва</span></div>
+          </div>
+        </div>
+        <div class="review reveal" style="--d:.08s">
+          <div class="review-stars">★★★★★</div>
+          <p>«Взял карго и футболку. Карго сидят идеально, карманы реально большие. Отдельный плюс — менеджер сам написал и помог с размером.»</p>
+          <div class="review-author">
+            <div class="avatar">Д</div>
+            <div><b>Даниил</b><span>Санкт-Петербург</span></div>
+          </div>
+        </div>
+        <div class="review reveal" style="--d:.16s">
+          <div class="review-stars">★★★★★</div>
+          <p>«Тоут-бэг взяла со скидкой — ткань плотная, ручки не режут плечо. Упаковано красиво, прям дарить можно. Буду брать свитер следующим дропом.»</p>
+          <div class="review-author">
+            <div class="avatar">М</div>
+            <div><b>Марина</b><span>Казань</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="section" style="padding-top:0">
+    <div class="container">
+      <div class="section-head center">
+        <span class="eyebrow center">Вопросы</span>
+        <h2 class="h-lg">Коротко о главном</h2>
+      </div>
+      <div class="faq-list">
+        <details class="faq-item reveal">
+          <summary>Сколько идёт доставка?<span class="faq-plus">+</span></summary>
+          <div class="faq-body">Отправляем СДЭК, Почтой России и Boxberry в течение 48 часов после подтверждения заказа. По Москве — 1–2 дня, по России — 3–7 дней. От 7 000 ₽ доставка бесплатная.</div>
+        </details>
+        <details class="faq-item reveal" style="--d:.06s">
+          <summary>Как подобрать размер?<span class="faq-plus">+</span></summary>
+          <div class="faq-body">Все вещи идут в оверсайз-посадке. Если любишь сидеть плотнее — бери на размер меньше. Напиши нам в Telegram, поможем с мерками конкретной модели.</div>
+        </details>
+        <details class="faq-item reveal" style="--d:.12s">
+          <summary>Можно вернуть или обменять?<span class="faq-plus">+</span></summary>
+          <div class="faq-body">Да: 14 дней на возврат без вопросов, если вещь не носилась и бирки на месте. Обмен размера — бесплатный, один раз.</div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="section" style="padding-top:0">
+    <div class="container">
+      <div class="cta-banner reveal">
+        <span class="eyebrow center">Не пропусти</span>
+        <h2 class="h-lg" style="margin-top:16px">Следующий дроп скоро растает</h2>
+        <p>Подписывайся на Telegram-канал — там анонсы, размеры в наличии и закрытые предзаказы для своих.</p>
+        <div style="display:flex; gap:14px; justify-content:center; flex-wrap:wrap">
+          <a class="btn btn-grad" href="catalog.html">К каталогу</a>
+          <a class="btn btn-ghost" href="https://t.me/aurora_store" target="_blank" rel="noopener">Telegram-канал</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Футер -->
+  <footer class="site-footer">
+    <div class="footer-glow"></div>
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="index.html" class="logo">
+            <span class="logo-mark">A</span>
+            <span>AURORA<span class="logo-sub">wear the light</span></span>
+          </a>
+          <p>Лимитированные дропы одежды и аксессуаров. Маленькие партии, большие эмоции.</p>
+          <div class="socials">
+            <a href="https://t.me/aurora_store" target="_blank" rel="noopener" aria-label="Telegram">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+            </a>
+            <a href="#" aria-label="ВКонтакте">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4v13a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V4"/><path d="M8 9c1 4 4 6 8 6"/></svg>
+            </a>
+            <a href="mailto:hello@aurora-store.ru" aria-label="Почта">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 7l-10 6L2 7"/></svg>
+            </a>
+          </div>
+        </div>
+        <div class="footer-col">
+          <h4>Навигация</h4>
+          <a href="index.html">Главная</a>
+          <a href="catalog.html">Каталог</a>
+          <a href="about.html">О бренде</a>
+          <a href="contacts.html">Контакты</a>
+        </div>
+        <div class="footer-col">
+          <h4>Категории</h4>
+          <a href="catalog.html?cat=hoodies">Худи и свитшоты</a>
+          <a href="catalog.html?cat=tees">Футболки и лонгсливы</a>
+          <a href="catalog.html?cat=pants">Брюки и джинсы</a>
+          <a href="catalog.html?cat=acc">Аксессуары</a>
+        </div>
+        <div class="footer-col">
+          <h4>Связь</h4>
+          <a href="https://t.me/aurora_store" target="_blank" rel="noopener">@aurora_store</a>
+          <a href="mailto:hello@aurora-store.ru">hello@aurora-store.ru</a>
+          <a href="contacts.html">Пн–Вс · 10:00–20:00</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© <span data-year>2026</span> AURORA. Все права защищены.</span>
+        <span class="made">Сделано с
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          на севере</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/products.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/index.js"></script>
+</body>
+</html>
