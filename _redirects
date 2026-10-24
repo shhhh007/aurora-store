@@ -1,10 +1,8 @@
 # Редиректы Cloudflare Pages
+# Красивые адреса (/catalog, /about, /admin) Pages раздаёт автоматически,
+# здесь только убираем /index.html из адресной строки.
 
-# Главная без /index.html
 /index.html /
 
-# Красивые адреса без .html
-/catalog /catalog.html 200
-/about /about.html 200
-/contacts /contacts.html 200
-/admin /admin.html 200
+# Внешний домен после привязки кастомного домена (раскомментируйте):
+# https://old-domain.pages.dev/* https://aurora-store.com/:splat 301
