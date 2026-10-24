@@ -1,8 +1,26 @@
 name = "aurora-store"
 compatibility_date = "2026-01-01"
 
-# Cloudflare Pages: сайт полностью статический, собирается из корня репозитория
+# Cloudflare Pages: сайт полностью статический + functions/ (Pages Functions)
 pages_build_output_dir = "."
 
-[vars]
-SHOP_NAME = "AURORA"
+# ─────────────────────────────────────────────────────────────
+# БИНДИНГИ ДЛЯ ТОВАРОВ И ФОТО
+#
+# Самый надёжный путь — создать биндинги в дашборде Cloudflare:
+#   Workers & Pages → aurora-store → Settings → Bindings:
+#     1) KV Namespace  → имя переменной PRODUCTS  → ваш namespace
+#     2) R2 Bucket     → имя переменной MEDIA     → ваш bucket
+#     3) Variables: ADMIN_PASSWORD, SESSION_SECRET
+# (пошагово — в README.md)
+#
+# Альтернатива — раскомментируйте и впишите свои id/имена:
+#
+# [[kv_namespaces]]
+# binding = "PRODUCTS"
+# id = "ВАШ_KV_NAMESPACE_ID"
+#
+# [[r2_buckets]]
+# binding = "MEDIA"
+# bucket_name = "aurora-media"
+# ─────────────────────────────────────────────────────────────

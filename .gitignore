@@ -9,6 +9,7 @@ Desktop.ini
 
 # Cloudflare local dev
 .wrangler/
+.dev.vars
 
 # Node (на случай локальных инструментов)
 node_modules/

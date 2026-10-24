@@ -1,0 +1,4 @@
+# Скопируйте этот файл в .dev.vars (он не коммитится) для локальной проверки:
+#   cp .dev.vars.example .dev.vars
+ADMIN_PASSWORD=local-admin
+SESSION_SECRET=local-dev-secret

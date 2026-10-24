@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — AURORA</title>
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#07070d">
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;800&family=Manrope:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+
+  <header class="site-header scrolled">
+    <div class="container header-inner">
+      <a href="index.html" class="logo">
+        <span class="logo-mark">A</span>
+        <span>AURORA<span class="logo-sub">admin panel</span></span>
+      </a>
+      <nav class="nav">
+        <a href="index.html">Storefront</a>
+        <a href="catalog.html">Catalog</a>
+        <a href="admin.html" class="active">Admin</a>
+      </nav>
+      <div class="header-actions">
+        <button class="btn btn-ghost btn-sm" data-logout hidden>Log out</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="admin-wrap">
+    <div class="container" id="admin-root">
+      <div class="admin-card" style="text-align:center">
+        <p style="color:var(--muted)">Loading…</p>
+      </div>
+    </div>
+  </main>
+
+  <script src="js/store.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>
