@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 750">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#141424"/>
+      <stop offset="1" stop-color="#090912"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.34" r="0.72">
+      <stop offset="0" stop-color="#6ee7b7" stop-opacity="0.5"/>
+      <stop offset="0.55" stop-color="#67e8f9" stop-opacity="0.16"/>
+      <stop offset="1" stop-color="#050508" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="item" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#6ee7b7"/>
+      <stop offset="1" stop-color="#67e8f9"/>
+    </linearGradient>
+  </defs>
+  <rect width="600" height="750" fill="url(#bg)"/>
+  <rect width="600" height="750" fill="url(#glow)"/>
+  <g stroke="#ffffff" stroke-opacity="0.045" stroke-width="1">
+    <path d="M0 187h600M0 375h600M0 562h600M150 0v750M300 0v750M450 0v750"/>
+  </g>
+  <text x="300" y="445" font-family="Arial Black, Arial, sans-serif" font-size="330" font-weight="900" text-anchor="middle" fill="none" stroke="#ffffff" stroke-opacity="0.08" stroke-width="2" letter-spacing="10">L</text>
+  <g transform="translate(300,340)" fill="none" stroke="url(#item)" stroke-width="13" stroke-linecap="round" stroke-linejoin="round">
+    
+<path d="M-80 -70 L-128 -18 L-118 120 L-80 122 L-78 8 L-78 118 L78 118 L78 8 L80 122 L118 120 L128 -18 L80 -70 C55 -48 -55 -48 -80 -70 Z"/>
+<path d="M-40 -78 C-25 -62 25 -62 40 -78" stroke-opacity="0.6"/>
+  </g>
+  <text x="300" y="700" font-family="Arial, sans-serif" font-size="19" font-weight="700" letter-spacing="8" text-anchor="middle" fill="#ffffff" fill-opacity="0.55">AURORA &#183; 04/12</text>
+  <circle cx="52" cy="52" r="5" fill="#6ee7b7" fill-opacity="0.9"/>
+  <circle cx="548" cy="698" r="5" fill="#67e8f9" fill-opacity="0.9"/>
+</svg>
