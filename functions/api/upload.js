@@ -15,8 +15,8 @@ const ALLOWED = {
 };
 
 export async function onRequestPost({ request, env }) {
-  if (!env.MEDIA) {
-    return json({ ok: false, error: 'R2 binding MEDIA is not configured' }, 503);
+  if (!env.MEDIA && !env.MEDIA_KV) {
+    return json({ ok: false, error: 'No media storage bound (R2 "MEDIA" or KV "MEDIA_KV")' }, 503);
   }
   if (!(await isAuthed(request, env))) {
     return json({ ok: false, error: 'Unauthorized' }, 401);
@@ -36,9 +36,12 @@ export async function onRequestPost({ request, env }) {
     }
     const buf = await file.arrayBuffer();
     const key = `${Date.now().toString(36)}-${crypto.randomUUID().slice(0, 8)}.${ext}`;
-    await env.MEDIA.put(key, buf, {
-      httpMetadata: { contentType: file.type },
-    });
+
+    if (env.MEDIA) {
+      await env.MEDIA.put(key, buf, { httpMetadata: { contentType: file.type } });
+    } else {
+      await env.MEDIA_KV.put(`img:${key}`, buf, { metadata: { contentType: file.type } });
+    }
     return json({ ok: true, url: `/img/${key}` });
   } catch {
     return json({ ok: false, error: 'Upload failed' }, 500);

@@ -72,7 +72,7 @@ function setupNote() {
   const { caps: c } = state;
   const missing = [];
   if (!c.kv) missing.push('KV namespace bound as <code>PRODUCTS</code>');
-  if (!c.r2) missing.push('R2 bucket bound as <code>MEDIA</code>');
+  if (!c.media) missing.push('photo storage: R2 bucket bound as <code>MEDIA</code> (or KV <code>MEDIA_KV</code>)');
   if (!c.password) missing.push('environment variables <code>ADMIN_PASSWORD</code> and <code>SESSION_SECRET</code>');
   if (!missing.length) return '';
   return `
@@ -203,7 +203,7 @@ function openForm(product) {
         <label class="upload-box" data-upload-box>
           <input type="file" accept="image/jpeg,image/png,image/webp,image/avif,image/gif" data-file-input>
           <div data-upload-preview>${p.image ? `<img src="${p.image}" alt="">` : `<div class="ph ${phClass(p.id)}"><span>?</span></div>`}</div>
-          <span data-upload-status>${state.caps.r2 ? 'Click to upload a photo, or paste an image URL below' : '⚠️ R2 binding not configured — paste an image URL below instead'}</span>
+          <span data-upload-status>${state.caps.media ? 'Click to upload a photo, or paste an image URL below' : '⚠️ Photo storage not configured — paste an image URL below instead'}</span>
         </label>
       </div>
       <div class="form-field full">

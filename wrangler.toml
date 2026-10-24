@@ -5,21 +5,18 @@ compatibility_date = "2026-01-01"
 pages_build_output_dir = "."
 
 # ─────────────────────────────────────────────────────────────
-# БИНДИНГИ ДЛЯ ТОВАРОВ И ФОТО
-#
-# Самый надёжный путь — создать биндинги в дашборде Cloudflare:
-#   Workers & Pages → aurora-store → Settings → Bindings:
-#     1) KV Namespace  → имя переменной PRODUCTS  → ваш namespace
-#     2) R2 Bucket     → имя переменной MEDIA     → ваш bucket
-#     3) Variables: ADMIN_PASSWORD, SESSION_SECRET
-# (пошагово — в README.md)
-#
-# Альтернатива — раскомментируйте и впишите свои id/имена:
-#
-# [[kv_namespaces]]
-# binding = "PRODUCTS"
-# id = "ВАШ_KV_NAMESPACE_ID"
-#
+# Биндинги (созданы и привязаны автоматически)
+[[kv_namespaces]]
+binding = "PRODUCTS"
+id = "ab04e15554ba487698a8be375a8363be"
+
+# Фото хранятся в том же KV, пока не включён R2.
+# После включения R2 в дашборде раскомментируйте блок ниже и сделайте redeploy —
+# загрузки автоматически переедут в R2 (старые ссылки /img/ продолжат работать).
+[[kv_namespaces]]
+binding = "MEDIA_KV"
+id = "ab04e15554ba487698a8be375a8363be"
+
 # [[r2_buckets]]
 # binding = "MEDIA"
 # bucket_name = "aurora-media"

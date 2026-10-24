@@ -58,6 +58,8 @@ export function caps(env) {
   return {
     kv: Boolean(env.PRODUCTS),
     r2: Boolean(env.MEDIA),
+    kvMedia: Boolean(env.MEDIA_KV),
+    media: Boolean(env.MEDIA || env.MEDIA_KV),
     password: Boolean(env.ADMIN_PASSWORD),
   };
 }
