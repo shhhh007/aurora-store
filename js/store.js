@@ -14,8 +14,8 @@ window.AuroraStore = {
     acc: 'Accessories',
   },
 
-  /* Валюта магазина: '$', '€', '₽' — поменяйте на свою */
-  currency: '$',
+  /* Валюта магазина: продажи в Германии — евро */
+  currency: '€',
 
   products: [],
   demo: false,
@@ -26,7 +26,7 @@ window.AuroraStore = {
   },
 
   fmt(n) {
-    return this.currency + new Intl.NumberFormat('en-US').format(n);
+    return new Intl.NumberFormat('de-DE').format(n) + ' ' + this.currency;
   },
 
   async load() {
@@ -55,50 +55,50 @@ window.AuroraStore = {
 const DEMO_PRODUCTS = [
   {
     id: 'demo-hoodie-polar',
-    name: 'Polar Oversized Hoodie',
+    name: 'Oversized Hoodie — Black',
     category: 'hoodies',
     price: 59, oldPrice: null, badge: 'new', rating: 4.9, reviews: 41,
     colors: ['#a78bfa', '#67e8f9', '#f3f3f8'], sizes: ['S', 'M', 'L', 'XL'],
-    desc: 'Heavyweight 320 gsm brushed fleece, double-layer hood, embroidered logo. Holds its shape wash after wash.',
+    desc: 'Heavyweight brushed fleece, double-layer hood. Quality checked before shipping.',
   },
   {
     id: 'demo-tee-black-ice',
-    name: 'Black Ice Tee',
+    name: 'Graphic Tee — White',
     category: 'tops',
     price: 29, oldPrice: null, badge: 'hit', rating: 5.0, reviews: 63,
     colors: ['#1e293b', '#f3f3f8', '#f0abfc'], sizes: ['S', 'M', 'L', 'XL'],
-    desc: '240 gsm combed cotton with a gradient print that never cracks or fades. Boxy, slightly long silhouette.',
+    desc: '240 gsm combed cotton with a crisp print that never cracks or fades.',
   },
   {
     id: 'demo-zip-aurora',
-    name: 'Aurora Zip Hoodie',
+    name: 'Zip Hoodie — Navy',
     category: 'hoodies',
     price: 64, oldPrice: null, badge: null, rating: 4.8, reviews: 27,
     colors: ['#67e8f9', '#f3f3f8', '#334155'], sizes: ['S', 'M', 'L', 'XL'],
-    desc: 'Two-way YKK zipper, stand-up collar, soft brushed inside. Your everyday layer for cold city nights.',
+    desc: 'Two-way zipper, stand-up collar, soft brushed inside. Your everyday layer.',
   },
   {
     id: 'demo-cargo-mist',
-    name: 'Mist Cargo Pants',
+    name: 'Cargo Pants — Grey',
     category: 'bottoms',
     price: 69, oldPrice: null, badge: 'new', rating: 4.9, reviews: 22,
     colors: ['#64748b', '#1e293b', '#6ee7b7'], sizes: ['S', 'M', 'L', 'XL'],
-    desc: 'Wide-leg ripstop cargos with six roomy pockets, ankle cinches and an elastic waistband.',
+    desc: 'Wide-leg ripstop cargos with six roomy pockets and an elastic waistband.',
   },
   {
     id: 'demo-beanie-polar',
-    name: 'Polar Beanie',
+    name: 'Knit Beanie — Black',
     category: 'acc',
     price: 14, oldPrice: null, badge: null, rating: 4.9, reviews: 38,
     colors: ['#1e293b', '#f0abfc', '#f3f3f8'], sizes: ['OS'],
-    desc: 'Double-layer acrylic knit with a fold-over cuff. No itch, no stretch-out, warm down to -20°C.',
+    desc: 'Double-layer knit with a fold-over cuff. No itch, no stretch-out.',
   },
   {
     id: 'demo-tote-ark',
-    name: 'Ark Tote Bag',
+    name: 'Canvas Tote Bag',
     category: 'acc',
-    price: 19, oldPrice: 24, badge: 'sale', rating: 4.8, reviews: 45,
+    price: 19, oldPrice: null, badge: null, rating: 4.8, reviews: 45,
     colors: ['#f3f3f8', '#1e293b', '#67e8f9'], sizes: ['OS'],
-    desc: '340 gsm cotton canvas shopper with long handles and an inner pocket. Carries up to 12 kg.',
+    desc: '340 gsm cotton canvas shopper with long handles and an inner pocket.',
   },
 ];

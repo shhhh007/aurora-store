@@ -139,7 +139,7 @@ function renderEditor() {
               <tr>
                 <td><div class="admin-thumb">${thumbHTML(p)}</div></td>
                 <td style="font-weight:700">${p.name}</td>
-                <td><b>${fmt(p.price)}</b>${p.oldPrice ? ` <s style="color:var(--muted-2)">${fmt(p.oldPrice)}</s>` : ''}</td>
+                <td><b>${fmt(p.price)}</b></td>
                 <td style="color:var(--muted)">${AuroraStore.categories[p.category] || p.category}</td>
                 <td>${p.badge ? `<span class="badge badge-${p.badge}">${p.badge}</span>` : '<span style="color:var(--muted-2)">—</span>'}</td>
                 <td>
@@ -219,10 +219,6 @@ function openForm(product) {
         <input id="f-price" name="price" type="number" min="0" step="0.01" value="${p.price}" required>
       </div>
       <div class="form-field">
-        <label for="f-old">Old price (for “Sale”)</label>
-        <input id="f-old" name="oldPrice" type="number" min="0" step="0.01" value="${p.oldPrice ?? ''}">
-      </div>
-      <div class="form-field">
         <label for="f-cat">Category</label>
         <select id="f-cat" name="category">
           ${Object.entries(AuroraStore.categories).map(([k, v]) =>
@@ -235,7 +231,6 @@ function openForm(product) {
           <option value="" ${!p.badge ? 'selected' : ''}>None</option>
           <option value="new" ${p.badge === 'new' ? 'selected' : ''}>New</option>
           <option value="hit" ${p.badge === 'hit' ? 'selected' : ''}>Hot</option>
-          <option value="sale" ${p.badge === 'sale' ? 'selected' : ''}>Sale</option>
         </select>
       </div>
       <div class="form-field">
@@ -298,7 +293,7 @@ function openForm(product) {
       id: p.id,
       name: String(f.get('name') || '').trim(),
       price: Number(f.get('price')) || 0,
-      oldPrice: f.get('oldPrice') ? Number(f.get('oldPrice')) : null,
+      oldPrice: null,
       badge: f.get('badge') || null,
       category: f.get('category'),
       rating: Number(f.get('rating')) || 0,

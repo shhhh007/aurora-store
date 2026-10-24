@@ -9,7 +9,7 @@
 
 const AURORA_CONFIG = {
   telegram: 'aurora_store',     // your Telegram handle without @
-  whatsapp: '79000000000',      // WhatsApp number, digits only
+  whatsapp: '490000000000',     // WhatsApp number, digits only (Germany)
   email: 'hello@aurora-store.com',
   freeShippingFrom: 70,         // free shipping threshold, in store currency
   promoCodes: { AURORA10: 10 }, // promo code -> percent off
@@ -28,7 +28,7 @@ async function ensureStore() {
   if (!AuroraStore.loaded) await AuroraStore.load();
 }
 
-const badgeLabel = { new: 'New', hit: 'Hot', sale: 'Sale' };
+const badgeLabel = { new: 'New', hit: 'Hot' };
 
 const load = (key, fallback) => {
   try { return JSON.parse(localStorage.getItem(key)) ?? fallback; }
@@ -138,7 +138,6 @@ function productMediaHTML(p, lazy = true) {
 
 function productCardHTML(p, delay = 0) {
   const fav = favs.includes(p.id);
-  const old = p.oldPrice ? `<s>${fmt(p.oldPrice)}</s>` : '';
   const badge = p.badge ? `<span class="badge badge-${p.badge}">${badgeLabel[p.badge] || p.badge}</span>` : '';
   const colors = (p.colors || []).map((c) => `<i style="background:${c}"></i>`).join('');
   const rating = p.reviews ? `<span class="results-count">★ ${p.rating} · ${p.reviews} reviews</span>` : '';
@@ -153,7 +152,7 @@ function productCardHTML(p, delay = 0) {
       <span class="product-cat">${catLabel(p.category)}</span>
       <h3 class="product-name">${p.name}</h3>
       <div class="product-row">
-        <div class="price"><b>${fmt(p.price)}</b>${old}</div>
+        <div class="price"><b>${fmt(p.price)}</b></div>
         <div class="product-colors">${colors}</div>
       </div>
       <div class="product-row">
@@ -386,7 +385,7 @@ function openCheckout() {
   openModal(`
     <button class="modal-close" data-modal-close aria-label="Close">${ICON.x}</button>
     <h3>Checkout</h3>
-    <p class="modal-sub">Pay on delivery or by link — we'll message you within the hour.</p>
+    <p class="modal-sub">Pay via PayPal or by card link — we'll message you within the hour.</p>
     <div class="checkout-summary">${list}
       <div style="margin-top:8px"><b style="color:var(--text)">Total: ${fmt(total)}</b>${disc ? ` <span style="color:var(--mint)">(−${fmt(disc)} off)</span>` : ''}</div>
     </div>
@@ -402,9 +401,9 @@ function openCheckout() {
       <div class="form-field">
         <label for="co-delivery">Delivery</label>
         <select id="co-delivery" name="delivery">
-          <option>Standard courier</option>
-          <option>Post</option>
-          <option>Express</option>
+          <option>Standard (≈2 weeks)</option>
+          <option>DHL Express</option>
+          <option>Deutsche Post</option>
           <option>Local pickup</option>
         </select>
       </div>
