@@ -458,15 +458,6 @@ function openCheckout() {
         <input id="co-contact" name="contact" type="text" placeholder="@nickname or +1 555 000-0000" required>
       </div>
       <div class="form-field">
-        <label for="co-delivery">Delivery</label>
-        <select id="co-delivery" name="delivery">
-          <option>Standard (≈2 weeks)</option>
-          <option>DHL Express</option>
-          <option>Deutsche Post</option>
-          <option>Local pickup</option>
-        </select>
-      </div>
-      <div class="form-field">
         <label for="co-note">Note</label>
         <textarea id="co-note" name="note" placeholder="City, address, comments…"></textarea>
       </div>
@@ -488,7 +479,6 @@ function openCheckout() {
     return [
       '🌌 AURORA order', '',
       ...lines, '',
-      `Delivery: ${data.delivery}`,
       `Total: ${fmt(total)}`,
       disc ? `Promo: ${promoCode} (−${fmt(disc)})` : '',
       '', `Name: ${data.name}`, `Contact: ${data.contact}`,
