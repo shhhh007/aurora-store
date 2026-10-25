@@ -8,9 +8,9 @@
 /* ---------- Store settings (edit to yours) ---------- */
 
 const AURORA_CONFIG = {
-  telegram: 'aurora_store',     // your Telegram handle without @
-  whatsapp: '490000000000',     // WhatsApp number, digits only (Germany)
-  email: 'hello@aurora-store.com',
+  telegram: 'shhhhhhh007',     // your Telegram handle without @
+  whatsapp: '4915212377202',     // WhatsApp number, digits only (Germany)
+  email: 'bordeianunicu29@gmail.com',
   freeShippingFrom: 70,         // free shipping threshold, in store currency
   promoCodes: { AURORA10: 10 }, // promo code -> percent off
 };
