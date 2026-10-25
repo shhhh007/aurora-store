@@ -58,12 +58,12 @@ function phClass(id) {
   return 'ph-' + (h % 4);
 }
 
-/* Цвет: объект {name, hex, images[]} (старый формат — строка-hex) */
+/* Цвет: объект {name, hex, images[]} (старый формат — строка-hex). hex опционален */
 function normColor(c) {
   if (typeof c === 'string') return { name: c, hex: c, images: [] };
   return {
-    name: (c && c.name) || (c && c.hex) || 'Color',
-    hex: (c && c.hex) || '#9b9bb0',
+    name: (c && c.name) || '',
+    hex: (c && c.hex) || '',
     images: (c && Array.isArray(c.images)) ? c.images : [],
   };
 }
@@ -304,8 +304,7 @@ function openForm(product) {
     wrap.innerHTML = p.colors.map((c, vi) => `
       <div class="variant-row" data-vi="${vi}">
         <div class="variant-head">
-          <input class="v-name" type="text" value="${c.name.replace(/"/g, '&quot;')}" placeholder="Color name (Black, Navy…)" data-v-name>
-          <input class="v-hex" type="color" value="${/^#[0-9a-fA-F]{6}$/.test(c.hex) ? c.hex : '#9b9bb0'}" data-v-hex title="Swatch color">
+          <input class="v-name" type="text" value="${c.name.replace(/"/g, '&quot;')}" placeholder="Color name (Black, Navy, Aquamarin…)" data-v-name>
           <button type="button" class="icon-btn" style="width:38px;height:38px" data-v-del title="Remove this color">${ICONS.trash}</button>
         </div>
         <div class="v-thumbs" data-v-thumbs>
@@ -369,7 +368,7 @@ function openForm(product) {
     const vi = Number(row.dataset.vi);
     const c = p.colors[vi];
     if (!c) return;
-    const files = [...e.target.files].slice(0, 6 - c.images.length);
+    const files = [...e.target.files].slice(0, 10 - c.images.length);
     if (!files.length) return;
     const status = $('[data-upload-status]', modal);
     let done = 0;
@@ -391,7 +390,7 @@ function openForm(product) {
   });
 
   $('[data-add-variant]', modal).addEventListener('click', () => {
-    if (p.colors.length >= 8) { toast('Max 8 colors per product', true); return; }
+    if (p.colors.length >= 20) { toast('Max 20 colors per product', true); return; }
     p.colors.push({ name: '', hex: '#9b9bb0', images: [] });
     renderVariants();
   });

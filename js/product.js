@@ -11,14 +11,17 @@ let sel = { color: null, size: null, img: null };
 
 function currentImages(p) {
   const colors = colorsOf(p);
+  /* Выбран цвет — показываем его фото (или главное, если у цвета нет своих) */
   if (sel.color) {
     const c = colors.find((x) => x.name === sel.color);
     if (c && c.images.length) return c.images;
+    return p.image ? [p.image] : [];
   }
+  /* Без выбранного цвета: главное фото первым, потом все остальные */
   const pool = [];
-  for (const c of colors) pool.push(...c.images);
   if (p.image) pool.push(p.image);
-  return pool.length ? pool : [];
+  for (const c of colors) for (const u of c.images) if (!pool.includes(u)) pool.push(u);
+  return pool;
 }
 
 function thumbHTML(p) {
@@ -50,11 +53,14 @@ function colorsHTML(p) {
   const colors = colorsOf(p);
   if (!colors.length) return '';
   return `
-    <label class="qv-label">Color — <span data-color-name style="color:var(--text)">${sel.color}</span></label>
+    <label class="qv-label">Color${sel.color ? ` — <span data-color-name style="color:var(--text)">${sel.color}</span>` : ' — <span data-color-name style="color:var(--text)">all photos</span>'}</label>
     <div class="swatches" data-colors>
+      <button class="swatch ${!sel.color ? 'active' : ''}" data-color="">
+        <i class="swatch-all"></i>All photos
+      </button>
       ${colors.map((c) => `
         <button class="swatch ${c.name === sel.color ? 'active' : ''}" data-color="${c.name}">
-          <i style="--c:${c.hex}"></i>${c.name}
+          ${c.hex ? `<i style="--c:${c.hex}"></i>` : ''}${c.name}
         </button>`).join('')}
     </div>`;
 }
@@ -83,8 +89,9 @@ function renderProduct() {
   }
 
   document.title = `${p.name} — AURORA`;
-  const colors = colorsOf(p);
-  if (!sel.color && colors.length) sel.color = colors[0].name;
+  /* Изначально цвет не выбран: галерея показывает главное фото товара */
+  if (sel.color === undefined) sel.color = null;
+  if (sel.color && !colorsOf(p).some((c) => c.name === sel.color)) sel.color = null;
 
   const badge = p.badge ? `<span class="badge badge-${p.badge}">${badgeLabel[p.badge] || p.badge}</span>` : '';
   const rating = p.reviews
@@ -102,8 +109,7 @@ function renderProduct() {
         <div class="price" style="margin:18px 0 20px"><b style="font-size:1.6rem">${fmt(p.price)}</b></div>
         <p style="color:var(--muted); margin-bottom:26px">${p.desc || ''}</p>
         ${colorsHTML(p)}
-        ${sizesHTML(p)}
-        <button class="btn btn-grad" style="width:100%; margin-top:26px" data-add-full="${p.id}">Add to cart — ${fmt(p.price)}</button>
+        ${sizesHTML(p)}        <button class="btn btn-grad" style="width:100%; margin-top:26px" data-add-full="${p.id}">Add to cart — ${fmt(p.price)}</button>
         <div style="margin-top:18px; color:var(--muted-2); font-size:.85rem; display:grid; gap:6px">
           <span>✓ Quality checked before shipping</span>
           <span>🚚 Average delivery ~2 weeks · Free shipping over ${fmt(AURORA_CONFIG.freeShippingFrom)}</span>

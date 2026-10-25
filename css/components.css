@@ -1436,6 +1436,10 @@
   flex: none;
 }
 
+.swatch i.swatch-all {
+  background: var(--grad);
+}
+
 .swatch:hover { border-color: var(--line-strong); color: var(--text); transform: translateY(-1px); }
 
 .swatch.active {

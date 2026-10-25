@@ -131,12 +131,16 @@ function phClass(id) {
   return 'ph-' + (h % 4);
 }
 
-/* Цвета могут прийти старым форматом (строка-hex) или объектом */
+/* Цвета могут прийти старым форматом (строка-hex) или объектом.
+   hex необязателен — цвет может быть просто названием. */
+const HEX_FULL_RE = /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/;
+
 function normColor(c) {
-  if (typeof c === 'string') return { name: c, hex: c, images: [] };
+  if (typeof c === 'string') return { name: c, hex: HEX_FULL_RE.test(c) ? c : '', images: [] };
+  const hex = (c && c.hex && HEX_FULL_RE.test(c.hex)) ? c.hex : '';
   return {
-    name: (c && c.name) || (c && c.hex) || 'Color',
-    hex: (c && c.hex) || '#9b9bb0',
+    name: (c && c.name) || hex || 'Color',
+    hex,
     images: (c && Array.isArray(c.images)) ? c.images : [],
   };
 }
@@ -145,17 +149,14 @@ function colorsOf(p) {
   return (p.colors || []).map(normColor);
 }
 
-/* Фото для конкретного цвета; без цвета — первое цветное или общее */
+/* Фото для конкретного цвета; без цвета — главное фото товара */
 function photoFor(p, colorName = null) {
   const colors = colorsOf(p);
-  let pool = [];
   if (colorName) {
     const c = colors.find((x) => x.name === colorName);
-    pool = c ? c.images : [];
-  } else if (colors.length) {
-    pool = colors[0].images;
+    if (c && c.images.length) return c.images[0];
   }
-  return pool[0] || p.image || '';
+  return p.image || (colors[0] && colors[0].images[0]) || '';
 }
 
 function productMediaHTML(p, colorName = null, lazy = true) {
@@ -171,16 +172,18 @@ function productCardHTML(p, delay = 0) {
   const fav = favs.includes(p.id);
   const badge = p.badge ? `<span class="badge badge-${p.badge}">${badgeLabel[p.badge] || p.badge}</span>` : '';
   const colors = colorsOf(p);
-  const colorDots = colors.length
-    ? colors.map((c, i) =>
-        `<button class="pc-dot ${i === 0 ? 'active' : ''}" data-pcdot="${p.id}" data-cname="${c.name}"
-           style="--c:${c.hex}" title="${c.name}" aria-label="${c.name}"></button>`).join('')
-    : '';
+  /* Точки на карточке — только у цветов с выбранным оттенком (hex) */
+  const colorDots = colors
+    .filter((c) => c.hex)
+    .map((c) =>
+      `<button class="pc-dot ${c.hex === colors[0].hex && colors[0].hex ? 'active' : ''}" data-pcdot="${p.id}" data-cname="${c.name}"
+         style="--c:${c.hex}" title="${c.name}" aria-label="${c.name}"></button>`)
+    .join('');
   const rating = p.reviews ? `<span class="results-count">★ ${p.rating} · ${p.reviews} reviews</span>` : '';
   return `
   <article class="product-card reveal" style="--d:${delay}s" data-tilt>
     <div class="product-media" data-media="${p.id}">
-      ${productMediaHTML(p, colors.length ? colors[0].name : null)}
+      ${productMediaHTML(p, null)}
       <div class="product-badges">${badge}</div>
       <button class="fav-btn ${fav ? 'active' : ''}" data-fav="${p.id}" aria-label="Add to favorites">${ICON.heart}</button>
     </div>
@@ -214,13 +217,12 @@ function quickAdd(id) {
     return;
   }
 
-  const selColor = colors.length ? colors[0].name : null;
   openModal(`
     <button class="modal-close" data-modal-close aria-label="Close">${ICON.x}</button>
     <h3>Add to cart</h3>
     <p class="modal-sub">${p.name}</p>
     <div class="qv-product">
-      <div class="qv-media" data-qv-media>${productMediaHTML(p, selColor)}</div>
+      <div class="qv-media" data-qv-media>${productMediaHTML(p, null)}</div>
       <div>
         <div class="price" style="margin-bottom:6px"><b>${fmt(p.price)}</b></div>
         <p style="color:var(--muted);font-size:0.85rem">${(p.desc || '').split('.')[0]}.</p>
@@ -229,9 +231,9 @@ function quickAdd(id) {
     ${colors.length > 1 ? `
     <label class="qv-label">Color</label>
     <div class="swatches" data-qv-colors>
-      ${colors.map((c, i) => `
-        <button class="swatch ${i === 0 ? 'active' : ''}" data-qv-color="${c.name}">
-          <i style="--c:${c.hex}"></i>${c.name}
+      ${colors.map((c) => `
+        <button class="swatch" data-qv-color="${c.name}">
+          ${c.hex ? `<i style="--c:${c.hex}"></i>` : ''}${c.name}
         </button>`).join('')}
     </div>` : ''}
     ${sizes.length > 1 ? `

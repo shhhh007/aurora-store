@@ -8,19 +8,22 @@ import { json, isAuthed } from './_lib.js';
 const MAX_PRODUCTS = 500;
 
 const HEX_RE = /^#[0-9a-fA-F]{3,8}$/;
+const MAX_COLORS = 20;
+const MAX_IMAGES_PER_COLOR = 10;
 
 function normColor(c) {
   if (typeof c === 'string') {
     return HEX_RE.test(c) ? { name: c, hex: c, images: [] } : null;
   }
   if (!c || typeof c !== 'object') return null;
-  const hex = HEX_RE.test(String(c.hex || '')) ? String(c.hex) : '#9b9bb0';
+  /* hex необязателен — цвет может быть просто названием */
+  const hex = HEX_RE.test(String(c.hex || '')) ? String(c.hex) : '';
   const images = (Array.isArray(c.images) ? c.images : [])
     .map((u) => String(u || '').slice(0, 300))
     .filter(Boolean)
-    .slice(0, 6);
+    .slice(0, MAX_IMAGES_PER_COLOR);
   return {
-    name: String(c.name || hex).trim().slice(0, 24) || hex,
+    name: String(c.name || hex).trim().slice(0, 30) || hex || 'Color',
     hex,
     images,
   };
@@ -36,8 +39,8 @@ function sanitize(p) {
     : [];
   const colors = (Array.isArray(p.colors) ? p.colors : [])
     .map(normColor)
-    .filter(Boolean)
-    .slice(0, 8);
+    .filter((c) => c.name || c.hex || c.images.length)
+    .slice(0, MAX_COLORS);
   return {
     id: String(p.id || `p_${crypto.randomUUID().slice(0, 8)}`).replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 40) || `p_${crypto.randomUUID().slice(0, 8)}`,
     name,
