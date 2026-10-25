@@ -17,11 +17,8 @@ function currentImages(p) {
     if (c && c.images.length) return c.images;
     return p.image ? [p.image] : [];
   }
-  /* Без выбранного цвета: главное фото первым, потом все остальные */
-  const pool = [];
-  if (p.image) pool.push(p.image);
-  for (const c of colors) for (const u of c.images) if (!pool.includes(u)) pool.push(u);
-  return pool;
+  /* Без выбранного цвета — только главное фото товара (одна фотка) */
+  return p.image ? [p.image] : [];
 }
 
 function thumbHTML(p) {
@@ -53,10 +50,10 @@ function colorsHTML(p) {
   const colors = colorsOf(p);
   if (!colors.length) return '';
   return `
-    <label class="qv-label">Color${sel.color ? ` — <span data-color-name style="color:var(--text)">${sel.color}</span>` : ' — <span data-color-name style="color:var(--text)">all photos</span>'}</label>
+    <label class="qv-label">Color${sel.color ? ` — <span data-color-name style="color:var(--text)">${sel.color}</span>` : ' — <span data-color-name style="color:var(--text)">Main</span>'}</label>
     <div class="swatches" data-colors>
-      <button class="swatch ${!sel.color ? 'active' : ''}" data-color="">
-        <i class="swatch-all"></i>All photos
+      <button class="swatch ${!sel.color ? 'active' : ''}" data-color="" title="Main product photo">
+        <i class="swatch-all"></i>Main
       </button>
       ${colors.map((c) => `
         <button class="swatch ${c.name === sel.color ? 'active' : ''}" data-color="${c.name}">
