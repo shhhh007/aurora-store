@@ -14,7 +14,7 @@ function heroShowcase(products) {
   ];
   cards.forEach((card, i) => {
     if (!picks[i]) return;
-    card.innerHTML = productMediaHTML(picks[i], false);
+    card.innerHTML = productMediaHTML(picks[i], null, false);
   });
 }
 

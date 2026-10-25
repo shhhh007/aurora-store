@@ -38,7 +38,7 @@ const save = (key, val) => localStorage.setItem(key, JSON.stringify(val));
 
 /* ---------- Cart ---------- */
 
-const CART_KEY = 'aurora_cart_v1';
+const CART_KEY = 'aurora_cart_v2';
 const PROMO_KEY = 'aurora_promo_v1';
 const FAVS_KEY = 'aurora_favs_v1';
 
@@ -58,27 +58,30 @@ function promoDiscount(sub) {
   return pct ? Math.round((sub * pct) / 100) : 0;
 }
 
-function addToCart(id, size, qty = 1) {
-  const line = cart.find((i) => i.id === id && i.size === size);
+function addToCart(id, size, qty = 1, color = null) {
+  const cKey = color || null;
+  const line = cart.find((i) => i.id === id && i.size === size && (i.color || null) === cKey);
   if (line) line.qty = Math.min(line.qty + qty, 99);
-  else cart.push({ id, size, qty });
+  else cart.push({ id, size, qty, color: cKey });
   saveCart();
   renderCart();
   updateCartBadge();
 }
 
-function removeLine(id, size) {
-  cart = cart.filter((i) => !(i.id === id && i.size === size));
+function removeLine(id, size, color = null) {
+  const cKey = color || null;
+  cart = cart.filter((i) => !(i.id === id && i.size === size && (i.color || null) === cKey));
   saveCart();
   renderCart();
   updateCartBadge();
 }
 
-function changeQty(id, size, delta) {
-  const line = cart.find((i) => i.id === id && i.size === size);
+function changeQty(id, size, delta, color = null) {
+  const cKey = color || null;
+  const line = cart.find((i) => i.id === id && i.size === size && (i.color || null) === cKey);
   if (!line) return;
   line.qty += delta;
-  if (line.qty <= 0) removeLine(id, size);
+  if (line.qty <= 0) removeLine(id, size, color);
   else { saveCart(); renderCart(); updateCartBadge(); }
 }
 
@@ -128,9 +131,37 @@ function phClass(id) {
   return 'ph-' + (h % 4);
 }
 
-function productMediaHTML(p, lazy = true) {
-  return p.image
-    ? `<img src="${p.image}" alt="${p.name}" ${lazy ? 'loading="lazy"' : ''}>`
+/* Цвета могут прийти старым форматом (строка-hex) или объектом */
+function normColor(c) {
+  if (typeof c === 'string') return { name: c, hex: c, images: [] };
+  return {
+    name: (c && c.name) || (c && c.hex) || 'Color',
+    hex: (c && c.hex) || '#9b9bb0',
+    images: (c && Array.isArray(c.images)) ? c.images : [],
+  };
+}
+
+function colorsOf(p) {
+  return (p.colors || []).map(normColor);
+}
+
+/* Фото для конкретного цвета; без цвета — первое цветное или общее */
+function photoFor(p, colorName = null) {
+  const colors = colorsOf(p);
+  let pool = [];
+  if (colorName) {
+    const c = colors.find((x) => x.name === colorName);
+    pool = c ? c.images : [];
+  } else if (colors.length) {
+    pool = colors[0].images;
+  }
+  return pool[0] || p.image || '';
+}
+
+function productMediaHTML(p, colorName = null, lazy = true) {
+  const img = photoFor(p, colorName);
+  return img
+    ? `<img src="${img}" alt="${p.name}" ${lazy ? 'loading="lazy"' : ''}>`
     : `<div class="ph ${phClass(p.id)}"><span>${(p.name || '?').trim().charAt(0).toUpperCase()}</span></div>`;
 }
 
@@ -139,21 +170,26 @@ function productMediaHTML(p, lazy = true) {
 function productCardHTML(p, delay = 0) {
   const fav = favs.includes(p.id);
   const badge = p.badge ? `<span class="badge badge-${p.badge}">${badgeLabel[p.badge] || p.badge}</span>` : '';
-  const colors = (p.colors || []).map((c) => `<i style="background:${c}"></i>`).join('');
+  const colors = colorsOf(p);
+  const colorDots = colors.length
+    ? colors.map((c, i) =>
+        `<button class="pc-dot ${i === 0 ? 'active' : ''}" data-pcdot="${p.id}" data-cname="${c.name}"
+           style="--c:${c.hex}" title="${c.name}" aria-label="${c.name}"></button>`).join('')
+    : '';
   const rating = p.reviews ? `<span class="results-count">★ ${p.rating} · ${p.reviews} reviews</span>` : '';
   return `
   <article class="product-card reveal" style="--d:${delay}s" data-tilt>
-    <div class="product-media">
-      ${productMediaHTML(p)}
+    <div class="product-media" data-media="${p.id}">
+      ${productMediaHTML(p, colors.length ? colors[0].name : null)}
       <div class="product-badges">${badge}</div>
       <button class="fav-btn ${fav ? 'active' : ''}" data-fav="${p.id}" aria-label="Add to favorites">${ICON.heart}</button>
     </div>
     <div class="product-body">
       <span class="product-cat">${catLabel(p.category)}</span>
-      <h3 class="product-name">${p.name}</h3>
+      <h3 class="product-name"><a href="product.html?id=${p.id}">${p.name}</a></h3>
       <div class="product-row">
         <div class="price"><b>${fmt(p.price)}</b></div>
-        <div class="product-colors">${colors}</div>
+        <div class="product-colors">${colorDots}</div>
       </div>
       <div class="product-row">
         ${rating || '<span></span>'}
@@ -163,39 +199,61 @@ function productCardHTML(p, delay = 0) {
   </article>`;
 }
 
-/* ---------- Quick add: pick a size, then into the cart ---------- */
+/* ---------- Quick add: pick a color and a size, then into the cart ---------- */
 
 function quickAdd(id) {
   const p = byId(id);
   if (!p) return;
-  if ((p.sizes || []).length <= 1) {
-    addToCart(p.id, (p.sizes || ['OS'])[0]);
+  const colors = colorsOf(p);
+  const sizes = p.sizes || ['OS'];
+
+  if (colors.length <= 1 && sizes.length <= 1) {
+    addToCart(p.id, sizes[0], 1, colors[0] ? colors[0].name : null);
     toast(`“${p.name}” added to cart`);
     openCart();
     return;
   }
+
+  const selColor = colors.length ? colors[0].name : null;
   openModal(`
     <button class="modal-close" data-modal-close aria-label="Close">${ICON.x}</button>
-    <h3>Select a size</h3>
+    <h3>Add to cart</h3>
     <p class="modal-sub">${p.name}</p>
     <div class="qv-product">
-      ${productMediaHTML(p)}
+      <div class="qv-media" data-qv-media>${productMediaHTML(p, selColor)}</div>
       <div>
         <div class="price" style="margin-bottom:6px"><b>${fmt(p.price)}</b></div>
         <p style="color:var(--muted);font-size:0.85rem">${(p.desc || '').split('.')[0]}.</p>
       </div>
     </div>
+    ${colors.length > 1 ? `
+    <label class="qv-label">Color</label>
+    <div class="swatches" data-qv-colors>
+      ${colors.map((c, i) => `
+        <button class="swatch ${i === 0 ? 'active' : ''}" data-qv-color="${c.name}">
+          <i style="--c:${c.hex}"></i>${c.name}
+        </button>`).join('')}
+    </div>` : ''}
+    ${sizes.length > 1 ? `
+    <label class="qv-label">Size</label>
     <div class="size-picker">
-      ${p.sizes.map((s, i) => `<button class="size-btn ${i === Math.floor(p.sizes.length / 2) ? 'active' : ''}" data-size="${s}">${s}</button>`).join('')}
-    </div>
+      ${sizes.map((s, i) => `<button class="size-btn ${i === Math.floor(sizes.length / 2) ? 'active' : ''}" data-size="${s}">${s}</button>`).join('')}
+    </div>` : ''}
     <button class="btn btn-grad" style="width:100%" data-qv-add="${p.id}">Add to cart — <span data-qv-price>${fmt(p.price)}</span></button>
   `);
+
   const modal = $('[data-modal]');
   modal.addEventListener('click', (e) => {
     const sizeBtn = e.target.closest('.size-btn');
     if (sizeBtn) {
       $$('.size-btn', modal).forEach((b) => b.classList.remove('active'));
       sizeBtn.classList.add('active');
+    }
+    const swatch = e.target.closest('[data-qv-color]');
+    if (swatch) {
+      $$('.swatch', modal).forEach((b) => b.classList.remove('active'));
+      swatch.classList.add('active');
+      $('[data-qv-media]', modal).innerHTML = productMediaHTML(p, swatch.dataset.qvColor);
     }
   });
 }
@@ -263,9 +321,10 @@ function ensureDrawer() {
     const inc = e.target.closest('[data-inc]');
     const dec = e.target.closest('[data-dec]');
     const rem = e.target.closest('[data-remove]');
-    if (inc) changeQty(inc.dataset.inc, inc.dataset.size, 1);
-    if (dec) changeQty(dec.dataset.dec, dec.dataset.size, -1);
-    if (rem) { removeLine(rem.dataset.remove, rem.dataset.size); toast('Removed from cart'); }
+    const cOf = (el) => el.dataset.color || null;
+    if (inc) changeQty(inc.dataset.inc, inc.dataset.size, 1, cOf(inc));
+    if (dec) changeQty(dec.dataset.dec, dec.dataset.size, -1, cOf(dec));
+    if (rem) { removeLine(rem.dataset.remove, rem.dataset.size, cOf(rem)); toast('Removed from cart'); }
     if (e.target.closest('[data-checkout]')) openCheckout();
     if (e.target.closest('[data-promo-apply]')) {
       const input = $('[data-promo-input]', drawer);
@@ -309,18 +368,18 @@ function renderCart() {
     if (!p) return '';
     return `
     <div class="cart-item">
-      <div class="cart-item-thumb">${productMediaHTML(p)}</div>
+      <div class="cart-item-thumb">${productMediaHTML(p, i.color)}</div>
       <div class="cart-item-info">
         <b>${p.name}</b>
-        <span>Size: ${i.size}</span>
+        <span>Size: ${i.size}${i.color ? ` · ${i.color}` : ''}</span>
         <div class="cart-item-qty">
-          <button class="qty-btn" data-dec="${p.id}" data-size="${i.size}" aria-label="Less">−</button>
+          <button class="qty-btn" data-dec="${p.id}" data-size="${i.size}" data-color="${i.color || ''}" aria-label="Less">−</button>
           <span class="qty-val">${i.qty}</span>
-          <button class="qty-btn" data-inc="${p.id}" data-size="${i.size}" aria-label="More">+</button>
+          <button class="qty-btn" data-inc="${p.id}" data-size="${i.size}" data-color="${i.color || ''}" aria-label="More">+</button>
         </div>
       </div>
       <div class="cart-item-side">
-        <button class="remove-btn" data-remove="${p.id}" data-size="${i.size}" aria-label="Remove">${ICON.trash}</button>
+        <button class="remove-btn" data-remove="${p.id}" data-size="${i.size}" data-color="${i.color || ''}" aria-label="Remove">${ICON.trash}</button>
         <b>${fmt(p.price * i.qty)}</b>
       </div>
     </div>`;
@@ -379,7 +438,7 @@ function openCheckout() {
   const total = sub - disc;
   const list = cart.map((i) => {
     const p = byId(i.id);
-    return `<div>${p.name} — ${i.size} × ${i.qty} — ${fmt(p.price * i.qty)}</div>`;
+    return `<div>${p.name}${i.color ? ` (${i.color})` : ''} — ${i.size} × ${i.qty} — ${fmt(p.price * i.qty)}</div>`;
   }).join('');
 
   openModal(`
@@ -424,7 +483,7 @@ function openCheckout() {
   const orderText = (data) => {
     const lines = cart.map((i, n) => {
       const p = byId(i.id);
-      return `${n + 1}) ${p.name} — ${i.size} × ${i.qty} — ${fmt(p.price * i.qty)}`;
+      return `${n + 1}) ${p.name}${i.color ? ` — ${i.color}` : ''} — ${i.size} × ${i.qty} — ${fmt(p.price * i.qty)}`;
     });
     return [
       '🌌 AURORA order', '',
@@ -539,6 +598,25 @@ function initSpotlight() {
 
 function initGlobalEvents() {
   document.addEventListener('click', (e) => {
+    /* Клик по фото/имени карточки → страница товара */
+    const card = e.target.closest('.product-card');
+    if (card && !e.target.closest('button, a')) {
+      const pid = $('[data-media]', card)?.dataset.media;
+      if (pid) { location.href = `product.html?id=${pid}`; return; }
+    }
+
+    /* Переключение цвета прямо на карточке */
+    const dot = e.target.closest('[data-pcdot]');
+    if (dot) {
+      const p = byId(dot.dataset.pcdot);
+      if (p) {
+        $$('.pc-dot', card).forEach((d) => d.classList.remove('active'));
+        dot.classList.add('active');
+        $('[data-media]', card).innerHTML = productMediaHTML(p, dot.dataset.cname);
+      }
+      return;
+    }
+
     const add = e.target.closest('[data-add]');
     if (add) { ensureStore().then(() => quickAdd(add.dataset.add)); return; }
 
@@ -552,8 +630,11 @@ function initGlobalEvents() {
 
     const qvAdd = e.target.closest('[data-qv-add]');
     if (qvAdd) {
-      const size = $('.size-btn.active', $('[data-modal]'));
-      addToCart(qvAdd.dataset.qvAdd, size ? size.dataset.size : 'OS');
+      const modal = $('[data-modal]');
+      const sizeBtn = $('.size-btn.active', modal);
+      const colorBtn = $('[data-qv-color].active', modal);
+      addToCart(qvAdd.dataset.qvAdd, sizeBtn ? sizeBtn.dataset.size : 'OS', 1,
+        colorBtn ? colorBtn.dataset.qvColor : null);
       closeModal();
       toast('Added to cart');
       openCart();

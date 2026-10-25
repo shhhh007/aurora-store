@@ -1353,6 +1353,257 @@
 .cat-tile .ph { transition: transform 0.8s var(--ease); }
 .cat-tile:hover .ph { transform: scale(1.06); }
 
+/* ---------- Страница товара ---------- */
+
+.product-view {
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: clamp(28px, 4vw, 56px);
+  align-items: start;
+}
+
+.gallery-main {
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  border: 1px solid var(--line-strong);
+  aspect-ratio: 4/5;
+  background: var(--bg-soft);
+}
+
+.gallery-main img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  animation: gallery-fade 0.45s var(--ease);
+}
+
+@keyframes gallery-fade {
+  from { opacity: 0; transform: scale(1.015); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.thumbs {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+
+.thumb {
+  width: 74px;
+  aspect-ratio: 4/5;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 2px solid var(--line);
+  opacity: 0.6;
+  cursor: pointer;
+  padding: 0;
+  background: var(--bg-soft);
+  transition: opacity 0.3s, border-color 0.3s, transform 0.3s var(--ease);
+}
+
+.thumb img { width: 100%; height: 100%; object-fit: cover; }
+
+.thumb:hover { opacity: 1; transform: translateY(-2px); }
+
+.thumb.active { border-color: var(--violet); opacity: 1; box-shadow: 0 0 18px rgba(167, 139, 250, 0.25); }
+
+.product-info .product-cat { display: block; }
+
+/* Свотчи выбора цвета */
+.swatches { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 22px; }
+
+.swatch {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 9px 16px 9px 11px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: var(--muted);
+  transition: border-color 0.3s, color 0.3s, transform 0.3s var(--ease);
+}
+
+.swatch i {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--c);
+  outline: 1px solid rgba(255, 255, 255, 0.25);
+  flex: none;
+}
+
+.swatch:hover { border-color: var(--line-strong); color: var(--text); transform: translateY(-1px); }
+
+.swatch.active {
+  border-color: #fff;
+  color: var(--text);
+  box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.18);
+}
+
+/* Цветные точки на карточках */
+.pc-dot {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: var(--c);
+  outline: 1px solid rgba(255, 255, 255, 0.25);
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: transform 0.25s var(--ease), outline-color 0.25s, box-shadow 0.25s;
+}
+
+.pc-dot:hover { transform: scale(1.2); }
+
+.pc-dot.active {
+  outline: 2px solid #fff;
+  transform: scale(1.12);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.25);
+}
+
+.qv-label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted-2);
+  margin: 0 0 10px;
+}
+
+.qv-media {
+  width: 120px;
+  aspect-ratio: 4/5;
+  border-radius: var(--r-md);
+  overflow: hidden;
+  flex: none;
+  background: var(--bg-soft);
+}
+
+.qv-media img { width: 100%; height: 100%; object-fit: cover; }
+
+.product-media { cursor: pointer; }
+
+.product-name a { color: inherit; transition: color 0.3s; }
+.product-name a:hover { color: var(--cyan); }
+
+@media (max-width: 960px) {
+  .product-view { grid-template-columns: 1fr; }
+}
+
+/* Редактор цветовых вариантов в админке */
+.variants-block { display: grid; gap: 12px; }
+
+.variant-row {
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  padding: 14px;
+  display: grid;
+  gap: 10px;
+  background: var(--bg-soft);
+}
+
+.variant-head { display: flex; gap: 8px; align-items: center; }
+
+.v-name {
+  flex: 1;
+  min-width: 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 0.9rem;
+  outline: none;
+}
+.v-name:focus { border-color: rgba(167, 139, 250, 0.5); }
+
+.v-hex {
+  width: 46px;
+  height: 38px;
+  padding: 3px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+  cursor: pointer;
+}
+
+.v-thumbs { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.v-thumb {
+  position: relative;
+  width: 52px;
+  height: 62px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+}
+
+.v-thumb img { width: 100%; height: 100%; object-fit: cover; }
+
+.v-thumb button {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0, 0, 0, 0.65);
+  color: #fff;
+  font-size: 11px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.v-add-img {
+  width: 52px;
+  height: 62px;
+  border: 1.5px dashed var(--line-strong);
+  border-radius: 8px;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 20px;
+  display: grid;
+  place-items: center;
+  transition: border-color 0.3s, color 0.3s;
+}
+.v-add-img:hover { border-color: rgba(167, 139, 250, 0.6); color: var(--violet); }
+.v-add-img input { display: none; }
+
+.v-url { display: flex; gap: 8px; }
+
+.v-url input {
+  flex: 1;
+  min-width: 0;
+  padding: 9px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--muted);
+  font-size: 0.84rem;
+  outline: none;
+}
+.v-url input:focus { border-color: rgba(103, 232, 249, 0.5); color: var(--text); }
+
+.v-url button {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+.v-url button:hover { background: rgba(255, 255, 255, 0.08); }
+
 /* ---------- Адаптив ---------- */
 
 @media (max-width: 1080px) {

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Product — AURORA</title>
+  <meta name="description" content="Hand-picked branded pieces, quality checked and delivered to Germany in about two weeks.">
+  <meta name="theme-color" content="#07070d">
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;800&family=Manrope:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css?v=7">
+  <link rel="stylesheet" href="css/components.css?v=7">
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo">
+        <span class="logo-mark">A</span>
+        <span>AURORA<span class="logo-sub">wear the light</span></span>
+      </a>
+      <nav class="nav">
+        <a href="index.html">Home</a>
+        <a href="catalog.html">Catalog</a>
+        <a href="about.html">How it works</a>
+        <a href="contacts.html">Contact</a>
+      </nav>
+      <div class="header-actions">
+        <button class="icon-btn" data-cart-open aria-label="Open cart">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+          <span class="cart-count">0</span>
+        </button>
+        <button class="icon-btn burger" data-burger aria-label="Menu">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h12"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div class="mobile-menu" data-mobile-menu>
+    <button class="icon-btn menu-close" data-burger aria-label="Close menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+    </button>
+    <a href="index.html">Home</a>
+    <a href="catalog.html">Catalog</a>
+    <a href="about.html">How it works</a>
+    <a href="contacts.html">Contact</a>
+  </div>
+
+  <!-- Page hero -->
+  <section class="page-hero" style="padding-bottom:24px">
+    <div class="container">
+      <a href="catalog.html" style="color:var(--muted); font-weight:700; font-size:.9rem; display:inline-flex; align-items:center; gap:8px">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+        Back to catalog
+      </a>
+    </div>
+  </section>
+
+  <!-- Product -->
+  <div class="container" style="padding-bottom:100px">
+    <div id="product-root"></div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-glow"></div>
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="index.html" class="logo">
+            <span class="logo-mark">A</span>
+            <span>AURORA<span class="logo-sub">wear the light</span></span>
+          </a>
+          <p>Hand-picked branded pieces, quality checked and delivered to Germany.</p>
+          <div class="socials">
+            <a href="https://t.me/aurora_store" target="_blank" rel="noopener" aria-label="Telegram">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+            </a>
+            <a href="https://wa.me/490000000000" target="_blank" rel="noopener" aria-label="WhatsApp">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8z"/></svg>
+            </a>
+            <a href="mailto:hello@aurora-store.com" aria-label="Email">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 7l-10 6L2 7"/></svg>
+            </a>
+          </div>
+        </div>
+        <div class="footer-col">
+          <h4>Navigation</h4>
+          <a href="index.html">Home</a>
+          <a href="catalog.html">Catalog</a>
+          <a href="about.html">How it works</a>
+          <a href="contacts.html">Contact</a>
+        </div>
+        <div class="footer-col">
+          <h4>Categories</h4>
+          <a href="catalog.html?cat=hoodies">Hoodies &amp; Sweats</a>
+          <a href="catalog.html?cat=tops">Tops &amp; Tees</a>
+          <a href="catalog.html?cat=bottoms">Bottoms</a>
+          <a href="catalog.html?cat=acc">Accessories</a>
+        </div>
+        <div class="footer-col">
+          <h4>Contact</h4>
+          <a href="https://t.me/aurora_store" target="_blank" rel="noopener">@aurora_store</a>
+          <a href="mailto:hello@aurora-store.com">hello@aurora-store.com</a>
+          <a href="contacts.html">Mon–Sun · 10:00–20:00</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© <span data-year>2026</span> AURORA · Germany. All rights reserved.</span>
+        <span class="made">Hand-picked in small batches · Quality checked</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/store.js?v=7"></script>
+  <script src="js/main.js?v=7"></script>
+  <script src="js/product.js?v=7"></script>
+</body>
+</html>

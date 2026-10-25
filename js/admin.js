@@ -58,6 +58,16 @@ function phClass(id) {
   return 'ph-' + (h % 4);
 }
 
+/* Цвет: объект {name, hex, images[]} (старый формат — строка-hex) */
+function normColor(c) {
+  if (typeof c === 'string') return { name: c, hex: c, images: [] };
+  return {
+    name: (c && c.name) || (c && c.hex) || 'Color',
+    hex: (c && c.hex) || '#9b9bb0',
+    images: (c && Array.isArray(c.images)) ? c.images : [],
+  };
+}
+
 function thumbHTML(p) {
   return p.image
     ? `<img src="${p.image}" alt="">`
@@ -184,7 +194,7 @@ async function saveProducts() {
 
 function openForm(product) {
   const p = product
-    ? { ...product }
+    ? { ...product, colors: (product.colors || []).map(normColor) }
     : {
         id: `p_${Math.random().toString(36).slice(2, 10)}`,
         name: '', price: 0, oldPrice: null, badge: '',
@@ -237,9 +247,10 @@ function openForm(product) {
         <label for="f-sizes">Sizes (comma-separated)</label>
         <input id="f-sizes" name="sizes" type="text" value="${(p.sizes || []).join(', ')}" placeholder="S, M, L, XL">
       </div>
-      <div class="form-field">
-        <label for="f-colors">Colors (hex, comma-separated)</label>
-        <input id="f-colors" name="colors" type="text" value="${(p.colors || []).join(', ')}" placeholder="#a78bfa, #f3f3f8">
+      <div class="form-field full">
+        <label>Color variants (optional — each color shows its own photos on the product page)</label>
+        <div class="variants-block" data-variants></div>
+        <button type="button" class="btn btn-ghost btn-sm" data-add-variant style="margin-top:10px">+ Add color</button>
       </div>
       <div class="form-field">
         <label for="f-rating">Rating (0–5)</label>
@@ -285,6 +296,108 @@ function openForm(product) {
     }
   });
 
+  /* ---------- Редактор цветовых вариантов ---------- */
+
+  function renderVariants() {
+    const wrap = $('[data-variants]', modal);
+    if (!wrap) return;
+    wrap.innerHTML = p.colors.map((c, vi) => `
+      <div class="variant-row" data-vi="${vi}">
+        <div class="variant-head">
+          <input class="v-name" type="text" value="${c.name.replace(/"/g, '&quot;')}" placeholder="Color name (Black, Navy…)" data-v-name>
+          <input class="v-hex" type="color" value="${/^#[0-9a-fA-F]{6}$/.test(c.hex) ? c.hex : '#9b9bb0'}" data-v-hex title="Swatch color">
+          <button type="button" class="icon-btn" style="width:38px;height:38px" data-v-del title="Remove this color">${ICONS.trash}</button>
+        </div>
+        <div class="v-thumbs" data-v-thumbs>
+          ${c.images.map((u, ii) => `
+            <div class="v-thumb"><img src="${u}" alt=""><button type="button" data-v-img-del="${ii}" title="Remove photo">×</button></div>`).join('')}
+          <label class="v-add-img" title="Upload photos for this color" ${state.caps.media ? '' : 'style="display:none"'}>
+            +<input type="file" accept="image/jpeg,image/png,image/webp,image/avif,image/gif" multiple data-v-file>
+          </label>
+        </div>
+        <div class="v-url">
+          <input type="text" placeholder="…or paste a photo URL for this color" data-v-url>
+          <button type="button" data-v-url-add aria-label="Add photo URL">+</button>
+        </div>
+      </div>`).join('');
+  }
+
+  const variantsBlock = $('[data-variants]', modal);
+  variantsBlock.addEventListener('click', async (e) => {
+    const row = e.target.closest('.variant-row');
+    if (!row) return;
+    const vi = Number(row.dataset.vi);
+    const c = p.colors[vi];
+    if (!c) return;
+
+    if (e.target.closest('[data-v-del]')) {
+      p.colors.splice(vi, 1);
+      renderVariants();
+      return;
+    }
+    const imgDel = e.target.closest('[data-v-img-del]');
+    if (imgDel) {
+      c.images.splice(Number(imgDel.dataset.vImgDel), 1);
+      renderVariants();
+      return;
+    }
+    const urlAdd = e.target.closest('[data-v-url-add]');
+    if (urlAdd) {
+      const input = $('[data-v-url]', row);
+      const url = input.value.trim();
+      if (url && c.images.length < 6) {
+        c.images.push(url);
+        renderVariants();
+      }
+      return;
+    }
+  });
+
+  variantsBlock.addEventListener('input', (e) => {
+    const row = e.target.closest('.variant-row');
+    if (!row) return;
+    const vi = Number(row.dataset.vi);
+    const c = p.colors[vi];
+    if (!c) return;
+    if (e.target.matches('[data-v-name]')) c.name = e.target.value;
+    if (e.target.matches('[data-v-hex]')) c.hex = e.target.value;
+  });
+
+  variantsBlock.addEventListener('change', async (e) => {
+    const row = e.target.closest('.variant-row');
+    if (!row || !e.target.matches('[data-v-file]')) return;
+    const vi = Number(row.dataset.vi);
+    const c = p.colors[vi];
+    if (!c) return;
+    const files = [...e.target.files].slice(0, 6 - c.images.length);
+    if (!files.length) return;
+    const status = $('[data-upload-status]', modal);
+    let done = 0;
+    for (const file of files) {
+      status.textContent = `Uploading photo ${++done}/${files.length}…`;
+      try {
+        const fd = new FormData();
+        fd.append('file', file);
+        const data = await api('/api/upload', { method: 'POST', body: fd });
+        c.images.push(data.url);
+      } catch (err) {
+        status.textContent = `⚠️ ${err.message}`;
+        renderVariants();
+        return;
+      }
+    }
+    status.textContent = 'Uploaded ✓ — don\'t forget to Save';
+    renderVariants();
+  });
+
+  $('[data-add-variant]', modal).addEventListener('click', () => {
+    if (p.colors.length >= 8) { toast('Max 8 colors per product', true); return; }
+    p.colors.push({ name: '', hex: '#9b9bb0', images: [] });
+    renderVariants();
+  });
+
+  renderVariants();
+
   $('[data-product-form]', modal).addEventListener('submit', async (e) => {
     e.preventDefault();
     const f = new FormData(e.target);
@@ -301,7 +414,7 @@ function openForm(product) {
       image,
       desc: String(f.get('desc') || '').trim(),
       sizes: String(f.get('sizes') || '').split(',').map((s) => s.trim()).filter(Boolean),
-      colors: String(f.get('colors') || '').split(',').map((s) => s.trim()).filter((s) => /^#[0-9a-fA-F]{3,8}$/.test(s)),
+      colors: p.colors.filter((c) => c.name || c.hex || c.images.length),
     };
     const idx = state.products.findIndex((x) => x.id === p.id);
     if (idx >= 0) state.products[idx] = next;

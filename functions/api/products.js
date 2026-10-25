@@ -7,6 +7,25 @@ import { json, isAuthed } from './_lib.js';
 
 const MAX_PRODUCTS = 500;
 
+const HEX_RE = /^#[0-9a-fA-F]{3,8}$/;
+
+function normColor(c) {
+  if (typeof c === 'string') {
+    return HEX_RE.test(c) ? { name: c, hex: c, images: [] } : null;
+  }
+  if (!c || typeof c !== 'object') return null;
+  const hex = HEX_RE.test(String(c.hex || '')) ? String(c.hex) : '#9b9bb0';
+  const images = (Array.isArray(c.images) ? c.images : [])
+    .map((u) => String(u || '').slice(0, 300))
+    .filter(Boolean)
+    .slice(0, 6);
+  return {
+    name: String(c.name || hex).trim().slice(0, 24) || hex,
+    hex,
+    images,
+  };
+}
+
 function sanitize(p) {
   if (!p || typeof p !== 'object') return null;
   const name = String(p.name || '').trim().slice(0, 120);
@@ -15,9 +34,10 @@ function sanitize(p) {
   const sizes = Array.isArray(p.sizes)
     ? p.sizes.map((s) => String(s).trim().slice(0, 8)).filter(Boolean).slice(0, 12)
     : [];
-  const colors = Array.isArray(p.colors)
-    ? p.colors.filter((c) => /^#[0-9a-fA-F]{3,8}$/.test(String(c))).slice(0, 6)
-    : [];
+  const colors = (Array.isArray(p.colors) ? p.colors : [])
+    .map(normColor)
+    .filter(Boolean)
+    .slice(0, 8);
   return {
     id: String(p.id || `p_${crypto.randomUUID().slice(0, 8)}`).replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 40) || `p_${crypto.randomUUID().slice(0, 8)}`,
     name,

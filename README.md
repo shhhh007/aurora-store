@@ -16,7 +16,7 @@ no monthly fees. One-time 5-minute setup in the Cloudflare dashboard.
 | Catalog | `/catalog` | Filters, search, sorting, favorites |
 | About | `/about` | Brand story |
 | Contact | `/contacts` | Contact form → WhatsApp |
-| **Admin** | `/admin` | **Your product management panel** |
+| **Admin** | `/admin` | **Your product management panel** — products, sizes and color variants, each color with its own photos |
 
 Cart, checkout, product photos and the admin panel are powered by
 Cloudflare Pages Functions + **KV** (products) + **R2** (photos).
